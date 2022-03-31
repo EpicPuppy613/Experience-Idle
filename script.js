@@ -3,6 +3,11 @@ String.prototype.format = function(){
     return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 };
 
+//SCALING CONFIGURATION
+const S = {};
+//LEVEL SCALING
+S.level = 1.5;
+
 const G = {};
 G.level = new Decimal(0);
 G.xp = new Decimal(0);
@@ -22,8 +27,9 @@ E.bar = document.getElementById('barprog');
 E.icon = document.getElementById('icon');
 E.points = document.getElementById('points');
 E.debug = document.getElementById('debug');
+E.devmenu = document.getElementById('dev');
 
-E.debug.style.display = 'none';
+E.devmenu.style.display = 'none';
 
 const A = {};
 A.Buyable = function (buyable, id) {
@@ -230,7 +236,7 @@ function Main() {
             // Squared XP Requirement
             // G.need = G.level.add(2).pow(2) * 250;
             // Exponential XP Requirement
-            G.need = G.need.mul(1.25);
+            G.need = G.need.mul(S.level);
             iter = iter.add(1);
         } else {
             break;
@@ -253,17 +259,30 @@ function UpdateUI() {
     document.title = G.percent + '% - Level ' + G.level.toFixed(0).format();
     var high = 0;
     for (const val of icons) {
-        if (G.xp.div(G.need).mul(100) >= val) {
+        if (G.xp.div(G.need).mul(100).gte(val)) {
             high = val;
         }
     }
     E.icon.href = 'icon/' + high + '.png';
-    E.debug.innerHTML = `POINTS: layer ${G.points.layer}, mag ${G.points.mag}, exp ${G.points.exponent}`;
+    E.debug.innerHTML = `
+    POINTS: layer ${G.points.layer}, mag ${G.points.mag.toFixed(2)}, exp ${G.points.exponent}<br>
+    XP: ${G.xp.toFixed(2)} layer ${G.xp.layer}, mag ${G.xp.mag.toFixed(2)}, exp ${G.xp.exponent}
+    `;
 }
 
-G.loop = setInterval(Main, 20);
+G.loop = setInterval(Main, 1000 / 50);
+
+K = "";
 
 document.addEventListener('keydown', function (e) {
-    if (e.code == 'KeyJ' && e.ctrlKey && e.shiftKey) {E.debug.style.display = '';}
-    if (e.code == 'KeyH' && e.ctrlKey && e.shiftKey) {E.debug.style.display = 'none';}
+    if (e.key == 'Enter') {
+        if (K == "devhax") {
+            E.devmenu.style.display = '';
+        } else if (K == "nohax") {
+            E.devmenu.style.display = 'none';
+        }
+        K = "";
+    } else {
+        K += e.key;
+    }
 })
