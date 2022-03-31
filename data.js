@@ -46,29 +46,29 @@ A
     ))
     //XP VALLEY
     .Buyable(new D.Buyable(
-        "XP Absorber I", "absorbs xp", "xp1", new Decimal(10), 1.5, 
+        "XP Absorber I", "absorbs xp", "xp1", new Decimal(10), 1.6, 
         function () {G.gain = G.gain.add(this.inc)}, 
         "xp", function () {return true}, {"inc": new Decimal(2)}, 'p'
     ), "xp1")
     .Buyable(new D.Buyable(
-        "XP Absorber II", "absorbs more xp", "xp2", new Decimal(100), 1.5, 
+        "XP Absorber II", "absorbs more xp", "xp2", new Decimal(100), 1.6,
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return G.level.gte(5)}, {"inc": new Decimal(20)}, 'p'
+        "xp", function () {return G.level.gte(5)}, {"inc": new Decimal(10)}, 'p'
     ), "xp2")
     .Buyable(new D.Buyable(
-        "XP Absorber III", "absorbs even more xp", "xp3", new Decimal(1500), 1.5,
+        "XP Absorber III", "absorbs even more xp", "xp3", new Decimal(1500), 1.6,
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return G.level.gte(15)}, {"inc": new Decimal(200)}, 'p'
+        "xp", function () {return G.level.gte(15)}, {"inc": new Decimal(50)}, 'p'
     ), "xp3")
     .Buyable(new D.Buyable(
         "XP Absorber IV", "absorbs a lot of xp", "xp4", new Decimal(15000), 1.5,
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return G.level.gte(30)}, {"inc": new Decimal(2000)}, 'p'
+        "xp", function () {return G.level.gte(30)}, {"inc": new Decimal(250)}, 'p'
     ), "xp4")
     .Buyable(new D.Buyable(
         "XP Absorber V", "absorbs a ton of xp", "xp5", new Decimal(200000), 1.5,
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return G.level.gte(50)}, {"inc": new Decimal(20000)}, 'p'
+        "xp", function () {return G.level.gte(50)}, {"inc": new Decimal(1250)}, 'p'
     ), "xp5")
     .Buyable(new D.Buyable(
         "XP Accelerator", "increases xp absorbtion rate", "xpa", new Decimal(250), 2,

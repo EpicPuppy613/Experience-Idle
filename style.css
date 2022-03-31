@@ -36,7 +36,6 @@ html {
     border-radius: 2px;
 }
 #main {
-    columns: 3;
     -webkit-column-break-inside: avoid-column;
     page-break-inside: avoid;
     break-inside: avoid-column;

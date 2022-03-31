@@ -1,3 +1,23 @@
+//COLUMN CONFIGURATION
+var width = window.innerWidth;
+document.getElementById('main').style.columnCount = 3;
+if (width < 1000) {
+    document.getElementById('main').style.columnCount = 2;
+}
+if (width < 600) {
+    document.getElementById('main').style.columnCount = 1;
+}
+
+window.addEventListener('resize', function (e) {
+    width = window.innerWidth;
+    document.getElementById('main').style.columnCount = 3;
+    if (width < 1000) {
+        document.getElementById('main').style.columnCount = 2;
+    }
+    if (width < 600) {
+        document.getElementById('main').style.columnCount = 1;
+    }
+});
 
 String.prototype.format = function(){
     return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
@@ -268,6 +288,20 @@ function UpdateUI() {
     POINTS: layer ${G.points.layer}, mag ${G.points.mag.toFixed(2)}, exp ${G.points.exponent}<br>
     XP: ${G.xp.toFixed(2)} layer ${G.xp.layer}, mag ${G.xp.mag.toFixed(2)}, exp ${G.xp.exponent}
     `;
+}
+
+function DevGive() {
+    const currency = document.getElementById('givecurrency').value;
+    if (currency == 'p') {
+        G.points = G.points.add(document.getElementById('give').value);
+    }
+}
+
+function DevGain() {
+    const currency = document.getElementById('gaincurrency').value;
+    if (currency == 'p') {
+        G.gain = G.gain.add(document.getElementById('gain').value);
+    }
 }
 
 G.loop = setInterval(Main, 1000 / 50);
