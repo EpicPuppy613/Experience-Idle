@@ -1,3 +1,12 @@
+h1, h2 {
+    margin-bottom: 12px;
+}
+h3, h4 {
+    margin-bottom: 8px;
+}
+h5, h6 {
+    margin-bottom: 6px;
+}
 html {
     text-align: center;
     font-family: monospace;
@@ -62,6 +71,9 @@ button:hover {
 }
 button:active {
     background-color: #888888;
+}
+button:disabled {
+    background-color: #222222;
 }
 .arrow {
     border: solid white;
