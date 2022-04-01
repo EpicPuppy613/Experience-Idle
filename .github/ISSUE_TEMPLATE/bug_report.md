@@ -3,7 +3,7 @@ name: Bug report
 about: Report a bug or unintended functionality in the game
 title: 'BUG: [Bug Title]'
 labels: bug
-assignees: ''
+assignees: EpicPuppy613
 
 ---
 
