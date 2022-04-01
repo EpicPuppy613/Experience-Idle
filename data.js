@@ -44,11 +44,15 @@ A
         "Multiverse", "multiverse",
         "#012", "#023", "#def", "", true
     ))
+    //CURRENCIES
+    .Currency(new D.Currency(
+        "XP Tokens", "xpt", 0, "gold", function () {return G.level.gte(2)}
+    ))
     //XP VALLEY
     .Buyable(new D.Buyable(
         "XP Absorber I", "absorbs xp", "xp1", new Decimal(10), 1.6, 
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return true}, {"inc": new Decimal(2)}, 'p'
+        "xp", function () {return true}, {"inc": new Decimal(2)}, 'xpt'
     ), "xp1")
     .Buyable(new D.Buyable(
         "XP Absorber II", "absorbs more xp", "xp2", new Decimal(100), 1.6,
@@ -93,6 +97,4 @@ A
         "xp", function () {return G.level.gte(20)}, {}, 'p'
     ), "xpm")
     //GOLD MINE
-    .Currency(new D.Currency(
-        "XP Tokens", "xpt", 0, "gold", function () {return true}
-    ))
+    

@@ -53,7 +53,7 @@ E.devmenu.style.display = 'none';
 
 const A = {};
 A.Buyable = function (buyable) {
-    id = buyable.id;
+    var id = buyable.id;
     G.buyables[id] = buyable;
     G.buyables[id].B.addEventListener('click', function () { G.buyables[id].Buy() });
     G.buyables[id].M.addEventListener('click', function () { G.buyables[id].BuyMax() });
@@ -105,7 +105,6 @@ D.Buyable = class Buyable {
         this.D = document.createElement('span');
         this.D.innerHTML = this.desc;
         this.N.innerHTML = this.name;
-        this.N.appendChild(this.I);
         this.E.appendChild(this.T);
         this.T.appendChild(this.N);
         G.panels[this.location].S.appendChild(this.E);
@@ -114,7 +113,8 @@ D.Buyable = class Buyable {
         this.M = document.createElement('button');
         this.M.innerHTML = 'Buy Max';
         this.C = document.createElement('span');
-        this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format();
+        if (this.type == 'p') this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' Pts';
+        else this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' ' + C[this.type].name;
         this.A = document.createElement('span');
         this.A.innerHTML = ' Buyable: 0';
         this.P = document.createElement('div');
@@ -135,7 +135,8 @@ D.Buyable = class Buyable {
         if (!this.unlocked) this.T.style.display = 'none';
     }
     CalcMax(points) {
-        return BruteForceIntegral(this.cost, this.gain, points);
+        if (this.type == 'p') return BruteForceIntegral(this.cost, this.gain, points);
+        else return BruteForceIntegral(this.cost, this.gain, C[this.type].amt);
     }
     Buy() {
         if (this.type == 'p') {
@@ -147,10 +148,9 @@ D.Buyable = class Buyable {
             }
         }
         else {
-            currency = C[this.type].amt;
-            if (currency.gte(this.cost)) {
+            if (C[this.type].amt.gte(this.cost)) {
                 this.OnBuy();
-                currency = currency.sub(this.cost);
+                C[this.type].amt = C[this.type].amt.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
                 this.owned += 1;
             }
@@ -166,19 +166,24 @@ D.Buyable = class Buyable {
             }
         }
         else {
-            currency = C[this.type].amt;
-            while (currency.gte(this.cost)) {
+            while (C[this.type].amt.gte(this.cost)) {
                 this.OnBuy();
-                currency = currency.sub(this.cost);
+                C[this.type].amt = C[this.type].amt.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
                 this.owned += 1;
             }
         }
     }
     Update() {
-        this.V.style.width = Math.min(G.points.div(this.cost).mul(100).toFixed(1), 100) + '%';
+        if (this.type == 'p') {
+            this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' Pts';
+            this.V.style.width = Math.min(G.points.div(this.cost).mul(100).toFixed(1), 100) + '%';
+        }
+        else {
+            this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' ' + C[this.type].name;
+            this.V.style.width = Math.min(C[this.type].amt.div(this.cost).mul(100).toFixed(1), 100) + '%';
+        }
         this.A.innerHTML = ' Buyable: ' + this.CalcMax(G.points);
-        this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format();
         this.N.innerHTML = this.name + ' [' + this.owned + ']';
         if (!this.unlocked) {
             this.unlocked = this.condition();
@@ -238,24 +243,39 @@ D.Currency = class Currency {
         this.V = document.createElement('strong');
         this.V.innerHTML = name + ': 0';
         this.E.appendChild(this.V);
+        this.GC = document.createElement('option');
+        this.GC.value = id;
+        this.GC.innerHTML = name;
+        document.getElementById('givecurrency').appendChild(this.GC);
+        this.RC = document.createElement('option');
+        this.RC.value = id;
+        this.RC.innerHTML = name;
+        document.getElementById('gaincurrency').appendChild(this.RC);
         G.panels[this.location].S.appendChild(this.E);
+        if (!this.unlocked) {
+            this.E.style.display = 'none';
+        }
     }
     Unlock() {
         this.unlocked = this.condition();
+        if (this.unlocked) this.E.style.display = '';
+    }
+    Tick () {
+        this.V.innerHTML = this.name + ': ' + this.amt.toFixed(2).format();
+        if (!this.unlocked) {
+            this.Unlock();
+        }
     }
 }
 
 const icons = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95];
 
-function Buy(item, mode) {
-
-}
-
 /**
- * Integral but the lazy way
- * @param principal {Decimal} the starting value
- * @param rate {Number} the growth rate
- * @param value {Decimal} the max amount
+ * How many times you can afford something with a growth rate
+ * @param {Number} principal - starting value
+ * @param {Number} rate - growth rate
+ * @param {Number} value - maximum value
+ * @returns 
  */
 function BruteForceIntegral(principal, rate, value) {
     current = 0;
@@ -292,6 +312,9 @@ function Main() {
     for (const b in G.buyables) {
         G.buyables[b].Update();
     }
+    for (const c in C) {
+        C[c].Tick();
+    }
     UpdateUI();
 }
 
@@ -322,12 +345,18 @@ function DevGive() {
     if (currency == 'p') {
         G.points = G.points.add(document.getElementById('give').value);
     }
+    else {
+        C[currency].amt = C[currency].amt.add(document.getElementById('give').value);
+    }
 }
 
 function DevGain() {
     const currency = document.getElementById('gaincurrency').value;
     if (currency == 'p') {
         G.gain = G.gain.add(document.getElementById('gain').value);
+    }
+    else {
+        C[currency].gain = C[currency].gain.add(document.getElementById('gain').value);
     }
 }
 
