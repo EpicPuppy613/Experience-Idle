@@ -1,7 +1,7 @@
 const G = {};
 G.level = new Decimal(0);
 G.xp = new Decimal(0);
-G.need = new Decimal(1000);
+G.need = new Decimal(500);
 G.percent = 0;
 G.gain = new Decimal(0);
 G.points = new Decimal('10');
@@ -41,6 +41,7 @@ A.Currency = function (currency) {
 A.Ascension = function (ascension) {
     var id = ascension.id;
     G.ascensions[id] = ascension;
+    G.ascensions[id].A.addEventListener('click', function () {G.ascensions[id].Ascend() });
 }
 
 const D = {};
@@ -58,8 +59,9 @@ D.Buyable = class Buyable {
      * @param {Object} vars - internal variables for the buyable
      * @param {String} type - purchase currency
      * @param {Number} tier - tier for resetting on ascension
+     * @param {Function} increase - returns amount to gain, most likely going to be (rate * owned)
      */
-    constructor(name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier) {
+    constructor(name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier, increase) {
         this.name = name;
         this.desc = desc;
         this.id = id;
@@ -71,6 +73,8 @@ D.Buyable = class Buyable {
         this.location = location;
         this.condition = condition;
         this.type = type;
+        this.tier = tier;
+        this.increase = increase;
         try {
             this.unlocked = this.condition();
         } catch {
@@ -122,7 +126,12 @@ D.Buyable = class Buyable {
     Buy() {
         if (this.type == 'p') {
             if (G.points.gte(this.cost)) {
-                this.OnBuy();
+                try {
+                    this.OnBuy();
+                }
+                catch (err) {
+                    console.log(err)
+                }
                 G.points = G.points.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
                 this.owned += 1;
@@ -130,7 +139,12 @@ D.Buyable = class Buyable {
         }
         else {
             if (C[this.type].amt.gte(this.cost)) {
-                this.OnBuy();
+                try {
+                    this.OnBuy();
+                }
+                catch (err) {
+                    console.log(err)
+                }
                 C[this.type].amt = C[this.type].amt.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
                 this.owned += 1;
@@ -140,7 +154,12 @@ D.Buyable = class Buyable {
     BuyMax() {
         if (this.type == 'p') {
             while (G.points.gte(this.cost)) {
-                this.OnBuy();
+                try {
+                    this.OnBuy();
+                }
+                catch (err) {
+                    console.log(err)
+                }
                 G.points = G.points.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
                 this.owned += 1;
@@ -148,7 +167,12 @@ D.Buyable = class Buyable {
         }
         else {
             while (C[this.type].amt.gte(this.cost)) {
-                this.OnBuy();
+                try {
+                    this.OnBuy();
+                }
+                catch (err) {
+                    console.log(err)
+                }
                 C[this.type].amt = C[this.type].amt.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
                 this.owned += 1;
@@ -175,7 +199,10 @@ D.Buyable = class Buyable {
         this.owned = 0;
         this.cost = this.initial;
         this.unlocked = false;
-        this.E.style.display = 'none';
+        this.T.style.display = 'none';
+        for (const v in this.startVar) {
+            this[v] = this.startVar[v];
+        }
         this.Update();
     }
 }
@@ -236,6 +263,7 @@ D.Currency = class Currency {
         this.initial = initial;
         this.location = location;
         this.condition = condition;
+        this.tier = tier;
         try {
             this.unlocked = this.condition();
         } catch {
@@ -286,7 +314,7 @@ D.Ascension = class Ascension {
      * @param {String} id - unique id for the ascension
      * @param {String} currency - id of a currency to reward
      * @param {Number} req - target currency amount required to ascend
-     * @param {String} target - target currency type
+     * @param {String} target - required currency type
      * @param {Function} scale - scaling for multiple of the new currency
      * @param {Number} mult - total multiplier for the new currency
      * @param {Function} condition - function that returns true if the ascension is unlocked
@@ -348,16 +376,47 @@ D.Ascension = class Ascension {
         if (this.target == 'p') {
             if (G.points.gte(this.req)) {
                 this.A.disabled = false;
+            } else {
+                this.A.disabled = true;
             }
-            this.reward = this.scale(G.points.div(this.req));
-            this.RV.innerHTML = this.reward.toFixed(2).format() + ' Pts';
+            this.reward = new Decimal(this.scale(G.points.div(this.req))).add(1);
+            
         }
         else {
             if (C[this.target].amt.gte(this.req)) {
                 this.A.disabled = false;
+            } else {
+                this.A.disabled = true;
             }
-            this.reward = this.scale(C[this.target].amt.div(this.req));
-            this.RV.innerHTML = this.reward.toFixed(2).format() + ' ' + C[this.currency].name;
+            this.reward = new Decimal(this.scale(C[this.target].amt.div(this.req))).add(1);
+            
+        }
+        if (this.currency == 'p') {
+            if (this.reward.lte(0.001)) this.RV.innerHTML = '0.00 Pts';
+            else this.RV.innerHTML = this.reward.toFixed(2).format() + ' Pts';
+        }
+        else {
+            if (this.reward.lte(0.001)) this.RV.innerHTML = '0.00 ' + C[this.currency].name;
+            else this.RV.innerHTML = this.reward.toFixed(2).format() + ' ' + C[this.currency].name;
+        }
+    }
+    Ascend() {
+        this.ascensions = this.ascensions.add(1);
+        C[this.currency].amt = C[this.currency].amt.add(this.reward);
+        G.points = new Decimal(10);
+        G.gain = new Decimal(0);
+        G.level = new Decimal(0);
+        G.xp = new Decimal(0);
+        G.need = new Decimal(500);
+        for (const c in C) {
+            if (C[c].tier < this.tier) {
+                C[c].Reset();
+            }
+        }
+        for (const b in G.buyables) {
+            if (G.buyables[b].tier < this.tier) {
+                G.buyables[b].Reset();
+            }
         }
     }
 }

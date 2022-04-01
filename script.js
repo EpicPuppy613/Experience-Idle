@@ -23,6 +23,27 @@ String.prototype.format = function () {
     return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 };
 
+String.prototype.formatZeros = function () {
+    try {
+    if (!(/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)&&!(/(?<!\.\d+)\d(?=e\d+)/).test(this)) return this;
+    if ((/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)) {
+        var match = /[0-9]+(\.)[0-9](?=e[0-9]+)/.match(this)[0];
+        return this.replace(/[0-9]+(\.)[0-9](?=e[0-9]+)/, match + '0');
+    }
+    if ((/(?<!\.\d+)\d(?=e\d+)/).test(this)) {
+        var match = /(?<!\.\d+)\d(?=e\d+)/.match(this)[0];
+        return this.replace(/(?<!\.\d+)\d(?=e\d+)/, match + '.00');
+    }
+    } catch {
+        if (!(/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)) return this;
+        if ((/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)) {
+            var match = /[0-9]+(\.)[0-9](?=e[0-9]+)/.match(this)[0];
+            return this.replace(/[0-9]+(\.)[0-9](?=e[0-9]+)/, match + '0');
+        }
+        return this;
+    }
+};
+
 //SCALING CONFIGURATION
 const S = {};
 //LEVEL SCALING
@@ -51,8 +72,12 @@ function BruteForceIntegral(principal, rate, value) {
 }
 
 function Main() {
+    G.gain = new Decimal(0);
+    for (const b in G.buyables) {
+        G.gain = G.gain.add(G.buyables[b].increase());
+    }
     G.xp = G.xp.add(G.gain);
-    G.points = G.points.add(G.gain.div(100));
+    G.points = G.points.add(G.gain.div(50));
     var iter = new Decimal(0);
     while (true) {
         if (G.xp.gte(G.need)) {
@@ -88,10 +113,10 @@ function UpdateUI() {
     E.level.innerHTML = 'Level ' + G.level.toFixed(0).format();
     E.prog.innerHTML = G.percent + '% (+' + G.gain.div(G.need).mul(5000).toFixed(2).format() + '%)';
     E.bar.style.width = Math.min(G.percent, 100) + '%';
-    if (G.points.gte('9e6')) E.points.innerHTML = 'Points: ' + G.points.toFixed(3).format() + ' (+' +
-        G.gain.div(2).toFixed(3).format() + ')';
-    else E.points.innerHTML = 'Points: ' + G.points.toFixed(1).format() + ' (+' +
-        G.gain.div(2).toFixed(2).format() + ')';
+    var points = G.points.toFixed(2).format().formatZeros();
+    var gain = G.gain.toFixed(2).format();
+    E.points.innerHTML = 'Points: ' + points + ' (+' +
+        gain + ')';
     document.title = G.percent + '% - Level ' + G.level.toFixed(0).format();
     var high = 0;
     for (const val of icons) {
@@ -104,6 +129,10 @@ function UpdateUI() {
     POINTS: layer ${G.points.layer}, mag ${G.points.mag.toFixed(2)}, exp ${G.points.exponent}<br>
     XP: ${G.xp.toFixed(2)} layer ${G.xp.layer}, mag ${G.xp.mag.toFixed(2)}, exp ${G.xp.exponent}
     `;
+    for (const a in G.ascensions) {
+        E.debug.innerHTML += `<br>${a}: 
+        currency ${G.ascensions[a].currency} reward ${G.ascensions[a].reward} target ${G.ascensions[a].target}`;
+    }
 }
 
 function DevGive() {

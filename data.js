@@ -53,54 +53,62 @@ A
     ))
     //XP VALLEY
     .Buyable(new D.Buyable(
-        "XP Absorber I", "absorbs xp", "xp1", new Decimal(10), 1.6, 
+        "XP Absorber I", "absorbs xp", "xp1", new Decimal(10), 1.5, 
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return true}, {"inc": new Decimal(2)}, 'p', 0
+        "xp", function () {return true}, 
+        {"inc": new Decimal(1)}, 
+        'p', 0, function () {return this.inc.mul(this.owned)}
     ))
     .Buyable(new D.Buyable(
-        "XP Absorber II", "absorbs more xp", "xp2", new Decimal(100), 1.6,
+        "XP Absorber II", "absorbs more xp", "xp2", new Decimal(100), 1.55,
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return G.level.gte(5)||G.ascensions["lgm"].ascensions.gte(1)}, {"inc": new Decimal(10)}, 'p', 0
+        "xp", function () {return G.level.gte(5)||G.ascensions["lgm"].ascensions.gte(1)}, 
+        {"inc": new Decimal(5)}, 
+        'p', 0, function () {return this.inc.mul(this.owned)}
     ))
     .Buyable(new D.Buyable(
         "XP Absorber III", "absorbs even more xp", "xp3", new Decimal(1500), 1.6,
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return G.level.gte(15)||G.ascensions["lgm"].ascensions.gte(2)}, {"inc": new Decimal(50)}, 'p', 0
+        "xp", function () {return G.level.gte(15)||G.ascensions["lgm"].ascensions.gte(2)}, 
+        {"inc": new Decimal(25)}, 
+        'p', 0, function () {return this.inc.mul(this.owned)}
     ))
     .Buyable(new D.Buyable(
-        "XP Absorber IV", "absorbs a lot of xp", "xp4", new Decimal(15000), 1.6,
+        "XP Absorber IV", "absorbs a lot of xp", "xp4", new Decimal(20000), 1.65,
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return G.level.gte(30)||G.ascensions["lgm"].ascensions.gte(2)}, {"inc": new Decimal(250)}, 'p', 0
+        "xp", function () {return G.level.gte(30)||G.ascensions["lgm"].ascensions.gte(2)}, 
+        {"inc": new Decimal(125)}, 
+        'p', 0, function () {return this.inc.mul(this.owned)}
     ))
     .Buyable(new D.Buyable(
-        "XP Absorber V", "absorbs a ton of xp", "xp5", new Decimal(200000), 1.6,
+        "XP Absorber V", "absorbs a ton of xp", "xp5", new Decimal(250000), 1.7,
         function () {G.gain = G.gain.add(this.inc)}, 
-        "xp", function () {return G.level.gte(50)||G.ascensions["lgm"].ascensions.gte(3)}, {"inc": new Decimal(1250)}, 'p', 0
+        "xp", function () {return G.level.gte(50)||G.ascensions["lgm"].ascensions.gte(3)}, 
+        {"inc": new Decimal(625)}, 
+        'p', 0, function () {return this.inc.mul(this.owned)}
     ))
     .Buyable(new D.Buyable(
-        "XP Accelerator", "increases xp absorbtion rate", "xpa", new Decimal(250), 2,
+        "XP Accelerator", "increases xp absorbtion rate", "xpa", new Decimal(500), 2,
         function () {
             for (var x = 1; x <= 5; x++) {
-                var old = G.buyables["xp" + x].inc;
-                G.buyables["xp" + x].inc = G.buyables["xp" + x].inc.mul(1.5);
-                G.gain.add((G.buyables["xp" + x].inc - old) * G.buyables["xp" + x].owned);
+                G.buyables["xp" + x].inc = G.buyables["xp" + x].inc.mul(1.4);
             }
         },
-        "xp", function () {return G.level.gte(10)||G.ascensions["lgm"].ascensions.gte(1)}, {}, 'p', 0
+        "xp", function () {return G.level.gte(10)||G.ascensions["lgm"].ascensions.gte(1)}, {}, 
+        'p', 0, function () {return 0}
     ))
     .Buyable(new D.Buyable(
-        "XP Multiplier", "increases xp absorbtion rate", "xpm", new Decimal(1000), 10,
+        "XP Multiplier", "increases xp absorbtion rate", "xpm", new Decimal(10000), 10,
         function () {
             for (var x = 1; x <= 5; x++) {
-                var old = G.buyables["xp" + x].inc;
                 G.buyables["xp" + x].inc = G.buyables["xp" + x].inc.mul(2);
-                G.gain.add((G.buyables["xp" + x].inc - old) * G.buyables["xp" + x].owned);
             }
         },
-        "xp", function () {return G.level.gte(20)||G.ascensions["lgm"].ascensions.gte(2)}, {}, 'p', 0
+        "xp", function () {return G.level.gte(20)||G.ascensions["lgm"].ascensions.gte(2)}, {}, 
+        'p', 0, function () {return 0}
     ))
     //GOLD MINE
     .Ascension(new D.Ascension(
-        "Learn Gold Mining", "lgm", "gxp", 1e16, "p", function(amt) {return amt.log10().div(new Decimal(2.5).log10())},
+        "Learn Gold Mining", "lgm", "gxp", 1e16, "p", function(amt) {return amt.log10().div(new Decimal(2).log10())},
         1, function() {return G.points.gte(1e12)}, "gold", 1
     ))
