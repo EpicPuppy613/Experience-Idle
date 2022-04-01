@@ -63,6 +63,22 @@ button:hover {
 button:active {
     background-color: #888888;
 }
+.arrow {
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    vertical-align:middle;
+}
+.arrow.close {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+}
+
+.arrow.open {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
 @keyframes indeterminate {
     0% {
         width: 0%;
@@ -75,5 +91,25 @@ button:active {
     100% {
         width: 0%;
         margin-left: 100%;
+    }
+}
+@keyframes open {
+    0% {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+    }
+    100% {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+    }
+}
+@keyframes close {
+    0% {
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+    }
+    100% {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
     }
 }

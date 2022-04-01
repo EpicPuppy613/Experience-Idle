@@ -19,7 +19,7 @@ window.addEventListener('resize', function (e) {
     }
 });
 
-String.prototype.format = function(){
+String.prototype.format = function () {
     return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 };
 
@@ -52,32 +52,38 @@ E.devmenu = document.getElementById('dev');
 E.devmenu.style.display = 'none';
 
 const A = {};
-A.Buyable = function (buyable, id) {
+A.Buyable = function (buyable) {
+    id = buyable.id;
     G.buyables[id] = buyable;
-    G.buyables[id].B.addEventListener('click', function () {G.buyables[id].Buy()});
-    G.buyables[id].M.addEventListener('click', function () {G.buyables[id].BuyMax()});
+    G.buyables[id].B.addEventListener('click', function () { G.buyables[id].Buy() });
+    G.buyables[id].M.addEventListener('click', function () { G.buyables[id].BuyMax() });
     return this;
 }
 A.Panel = function (panel) {
     G.panels[panel.id] = panel;
     return this;
 }
+A.Currency = function (currency) {
+    C[currency.id] = currency;
+    return this;
+}
 
 const D = {};
 D.Buyable = class Buyable {
     /**
-     * Purchasable item
-     * @param name {String} name of buyable
-     * @param desc {String} description of buyable
-     * @param id {String} id of buyable
-     * @param initial {Decimal/Number} starting price
-     * @param gain {Number} price increase
-     * @param onbuy {Function} run when bought
-     * @param location {String} id of containing panel
-     * @param condition {Function} returns true when buyable should be unlocked
-     * @param vars {Object} contains internal variables that should be stored in the buyable object
+     * A buyable object by using a currency
+     * @param {String} name - the name of the buyable
+     * @param {String} desc - a description of the buyable
+     * @param {String} id - unique id for the buyable
+     * @param {Number} initial - initial price of the buyable
+     * @param {Number} gain - price gain of the buyable
+     * @param {Function} onbuy - execute on purchase of the buyable
+     * @param {String} location - containing panel of the buyable
+     * @param {Function} condition - function that returns true when the buyable should be unlocked
+     * @param {Object} vars - internal variables for the buyable
+     * @param {String} type - purchase currency
      */
-    constructor (name, desc, id, initial, gain, onbuy, location, condition, vars, type) {
+    constructor(name, desc, id, initial, gain, onbuy, location, condition, vars, type) {
         this.name = name;
         this.desc = desc;
         this.id = id;
@@ -99,6 +105,7 @@ D.Buyable = class Buyable {
         this.D = document.createElement('span');
         this.D.innerHTML = this.desc;
         this.N.innerHTML = this.name;
+        this.N.appendChild(this.I);
         this.E.appendChild(this.T);
         this.T.appendChild(this.N);
         G.panels[this.location].S.appendChild(this.E);
@@ -127,10 +134,10 @@ D.Buyable = class Buyable {
         this.T.appendChild(this.A);
         if (!this.unlocked) this.T.style.display = 'none';
     }
-    CalcMax (points) {
+    CalcMax(points) {
         return BruteForceIntegral(this.cost, this.gain, points);
     }
-    Buy () {
+    Buy() {
         if (this.type == 'p') {
             if (G.points.gte(this.cost)) {
                 this.OnBuy();
@@ -149,7 +156,7 @@ D.Buyable = class Buyable {
             }
         }
     }
-    BuyMax () {
+    BuyMax() {
         if (this.type == 'p') {
             while (G.points.gte(this.cost)) {
                 this.OnBuy();
@@ -168,7 +175,7 @@ D.Buyable = class Buyable {
             }
         }
     }
-    Update () {
+    Update() {
         this.V.style.width = Math.min(G.points.div(this.cost).mul(100).toFixed(1), 100) + '%';
         this.A.innerHTML = ' Buyable: ' + this.CalcMax(G.points);
         this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format();
@@ -181,16 +188,16 @@ D.Buyable = class Buyable {
 }
 D.Panel = class Panel {
     /**
-     * Container for stuff
-     * @param title {String} title of the panel
-     * @param id {String} id of the panel
-     * @param color1 {String} first color of the panel gradient
-     * @param color2 {String} second color of the panel gradient
-     * @param color3 {String} color of the panel text
-     * @param color4 {String} color or progress bars
-     * @param hidden {Boolean} panel should be hidden at the start
+     * A panel that contains stuff
+     * @param {String} title - the name of the panel
+     * @param {String} id - a unique id for the panel
+     * @param {String} color1 - top color for the panel gradient
+     * @param {String} color2 - bottom color for the panel gradient
+     * @param {String} color3 - text color for the panel
+     * @param {String} color4 - progress bar color for the panel
+     * @param {Boolean} hidden - if the panel should start hidden
      */
-    constructor (title, id, color1, color2, color3, color4, hidden) {
+    constructor(title, id, color1, color2, color3, color4, hidden) {
         this.title = title;
         this.id = id;
         this.color = [color1, color2, color3, color4];
@@ -210,12 +217,30 @@ D.Panel = class Panel {
     }
 }
 D.Currency = class Currency {
-    constructor (name, id, initial, location, condition) {
+    /**
+     * A currency that can be used for stuff
+     * @param {String} name - the name of the currency
+     * @param {String} id - the unique id of the currency
+     * @param {Number} initial - the initial amount of the currency
+     * @param {String} location - the containing panel for the currency
+     * @param {Function} condition - function should return true if the currency is unlocked
+     */
+    constructor(name, id, initial, location, condition) {
         this.name = name;
         this.id = id;
         this.initial = initial;
         this.location = location;
         this.condition = condition;
+        this.unlocked = this.condition();
+        this.amt = new Decimal(initial);
+        this.gain = new Decimal(0);
+        this.E = document.createElement('div');
+        this.V = document.createElement('strong');
+        this.V.innerHTML = name + ': 0';
+        this.E.appendChild(this.V);
+        G.panels[this.location].S.appendChild(this.E);
+    }
+    Unlock() {
         this.unlocked = this.condition();
     }
 }
@@ -274,8 +299,10 @@ function UpdateUI() {
     E.level.innerHTML = 'Level ' + G.level.toFixed(0).format();
     E.prog.innerHTML = G.percent + '% (+' + G.gain.div(G.need).mul(5000).toFixed(2).format() + '%)';
     E.bar.style.width = Math.min(G.percent, 100) + '%';
-    if (G.points.gte('9e6')) E.points.innerHTML = 'Points: ' + G.points.toFixed(3).format() + ' (+' + G.gain.div(2).toFixed(3).format() + ')';
-    else E.points.innerHTML = 'Points: ' + G.points.toFixed(1).format() + ' (+' + G.gain.div(2).toFixed(2).format() + ')';
+    if (G.points.gte('9e6')) E.points.innerHTML = 'Points: ' + G.points.toFixed(3).format() + ' (+' +
+        G.gain.div(2).toFixed(3).format() + ')';
+    else E.points.innerHTML = 'Points: ' + G.points.toFixed(1).format() + ' (+' +
+        G.gain.div(2).toFixed(2).format() + ')';
     document.title = G.percent + '% - Level ' + G.level.toFixed(0).format();
     var high = 0;
     for (const val of icons) {

@@ -61,12 +61,12 @@ A
         "xp", function () {return G.level.gte(15)}, {"inc": new Decimal(50)}, 'p'
     ), "xp3")
     .Buyable(new D.Buyable(
-        "XP Absorber IV", "absorbs a lot of xp", "xp4", new Decimal(15000), 1.5,
+        "XP Absorber IV", "absorbs a lot of xp", "xp4", new Decimal(15000), 1.6,
         function () {G.gain = G.gain.add(this.inc)}, 
         "xp", function () {return G.level.gte(30)}, {"inc": new Decimal(250)}, 'p'
     ), "xp4")
     .Buyable(new D.Buyable(
-        "XP Absorber V", "absorbs a ton of xp", "xp5", new Decimal(200000), 1.5,
+        "XP Absorber V", "absorbs a ton of xp", "xp5", new Decimal(200000), 1.6,
         function () {G.gain = G.gain.add(this.inc)}, 
         "xp", function () {return G.level.gte(50)}, {"inc": new Decimal(1250)}, 'p'
     ), "xp5")
@@ -92,3 +92,7 @@ A
         },
         "xp", function () {return G.level.gte(20)}, {}, 'p'
     ), "xpm")
+    //GOLD MINE
+    .Currency(new D.Currency(
+        "XP Tokens", "xpt", 0, "gold", function () {return true}
+    ))
