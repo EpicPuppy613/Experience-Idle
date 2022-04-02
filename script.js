@@ -1,20 +1,20 @@
 //COLUMN CONFIGURATION
 var width = window.innerWidth;
 document.getElementById('main').style.columnCount = 3;
-if (width < 1000) {
+if (width < 1800) {
     document.getElementById('main').style.columnCount = 2;
 }
-if (width < 600) {
+if (width < 1000) {
     document.getElementById('main').style.columnCount = 1;
 }
 
 window.addEventListener('resize', function (e) {
     width = window.innerWidth;
     document.getElementById('main').style.columnCount = 3;
-    if (width < 1000) {
+    if (width < 1800) {
         document.getElementById('main').style.columnCount = 2;
     }
-    if (width < 600) {
+    if (width < 1000) {
         document.getElementById('main').style.columnCount = 1;
     }
 });
@@ -24,24 +24,9 @@ String.prototype.format = function () {
 };
 
 String.prototype.formatZeros = function () {
-    try {
-    if (!(/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)&&!(/(?<!\.\d+)\d(?=e\d+)/).test(this)) return this;
-    if ((/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)) {
-        var match = /[0-9]+(\.)[0-9](?=e[0-9]+)/.match(this)[0];
-        return this.replace(/[0-9]+(\.)[0-9](?=e[0-9]+)/, match + '0');
-    }
-    if ((/(?<!\.\d+)\d(?=e\d+)/).test(this)) {
-        var match = /(?<!\.\d+)\d(?=e\d+)/.match(this)[0];
-        return this.replace(/(?<!\.\d+)\d(?=e\d+)/, match + '.00');
-    }
-    } catch {
-        if (!(/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)) return this;
-        if ((/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)) {
-            var match = /[0-9]+(\.)[0-9](?=e[0-9]+)/.match(this)[0];
-            return this.replace(/[0-9]+(\.)[0-9](?=e[0-9]+)/, match + '0');
-        }
-        return this;
-    }
+    if (!(/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)) return this;
+    var match = (/[0-9]+(\.)[0-9](?=e[0-9]+)/).match(this)[0];
+    return this.replace(/[0-9]+(\.)[0-9](?=e[0-9]+)/, match + '0');
 };
 
 //SCALING CONFIGURATION
@@ -73,11 +58,24 @@ function BruteForceIntegral(principal, rate, value) {
 
 function Main() {
     G.gain = new Decimal(0);
-    for (const b in G.buyables) {
-        G.gain = G.gain.add(G.buyables[b].increase());
+    G.mult = new Decimal(1);
+    for (const c in C) {
+        C[c].mult = new Decimal(1);
+        C[c].gain = new Decimal(0);
     }
-    G.xp = G.xp.add(G.gain);
-    G.points = G.points.add(G.gain.div(50));
+    for (const b in G.buyables) {
+        if (G.buyables[b].generate == 'p') G.gain = G.gain.add(G.buyables[b].increase());
+        else C[G.buyables[b].generate].gain = C[G.buyables[b].generate].gain.add(G.buyables[b].increase());
+    }
+    for (const b in G.buyables) {
+        if (G.buyables[b].generate == 'p') G.mult = G.mult.mul(G.buyables[b].mult());
+        else C[G.buyables[b].generate].mult = C[G.buyables[b].generate].mult.add(G.buyables[b].mult());
+    }
+    for (const c in C) {
+        C[c].Tick();
+    }
+    G.xp = G.xp.add(G.gain.mul(G.mult));
+    G.points = G.points.add(G.gain.mul(G.mult).div(50));
     var iter = new Decimal(0);
     while (true) {
         if (G.xp.gte(G.need)) {
@@ -103,18 +101,15 @@ function Main() {
     for (const b in G.buyables) {
         G.buyables[b].Update();
     }
-    for (const c in C) {
-        C[c].Tick();
-    }
     UpdateUI();
 }
 
 function UpdateUI() {
     E.level.innerHTML = 'Level ' + G.level.toFixed(0).format();
-    E.prog.innerHTML = G.percent + '% (+' + G.gain.div(G.need).mul(5000).toFixed(2).format() + '%)';
+    E.prog.innerHTML = G.percent + '% (+' + G.gain.mul(G.mult).div(G.need).mul(5000).toFixed(2).format() + '%)';
     E.bar.style.width = Math.min(G.percent, 100) + '%';
     var points = G.points.toFixed(2).format().formatZeros();
-    var gain = G.gain.toFixed(2).format();
+    var gain = G.gain.mul(G.mult).toFixed(2).format();
     E.points.innerHTML = 'Points: ' + points + ' (+' +
         gain + ')';
     document.title = G.percent + '% - Level ' + G.level.toFixed(0).format();

@@ -4,6 +4,7 @@ G.xp = new Decimal(0);
 G.need = new Decimal(500);
 G.percent = 0;
 G.gain = new Decimal(0);
+G.mult = new Decimal(1);
 G.points = new Decimal('10');
 G.buyables = {};
 G.panels = {};
@@ -59,9 +60,11 @@ D.Buyable = class Buyable {
      * @param {Object} vars - internal variables for the buyable
      * @param {String} type - purchase currency
      * @param {Number} tier - tier for resetting on ascension
+     * @param {String} generate - currency to generate
      * @param {Function} increase - returns amount to gain, most likely going to be (rate * owned)
+     * @param {Function} mult - returns multiplier for the buyable's generation currency
      */
-    constructor(name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier, increase) {
+    constructor(name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier, generate, increase, mult) {
         this.name = name;
         this.desc = desc;
         this.id = id;
@@ -74,7 +77,9 @@ D.Buyable = class Buyable {
         this.condition = condition;
         this.type = type;
         this.tier = tier;
+        this.generate = generate;
         this.increase = increase;
+        this.mult = mult;
         try {
             this.unlocked = this.condition();
         } catch {
@@ -92,6 +97,8 @@ D.Buyable = class Buyable {
         this.D.innerHTML = this.desc;
         this.N.innerHTML = this.name;
         this.E.appendChild(this.T);
+        this.E.style.display = 'inline-block';
+        this.E.style.width = '90%';
         this.T.appendChild(this.N);
         G.panels[this.location].S.appendChild(this.E);
         this.B = document.createElement('button');
@@ -192,7 +199,7 @@ D.Buyable = class Buyable {
         this.N.innerHTML = this.name + ' [' + this.owned + ']';
         if (!this.unlocked) {
             this.unlocked = this.condition();
-            if (this.unlocked) this.T.style.display = '';
+            if (this.unlocked) this.T.style.display = 'inline-block';
         }
     }
     Reset() {
@@ -236,6 +243,7 @@ D.Panel = class Panel {
         this.E.style.color = this.color[2];
         this.E.classList.add('panel');
         this.S = document.createElement('div');
+        this.S.style.columns = '2';
         this.E.appendChild(this.S);
         document.getElementById('main').appendChild(this.E);
         document.getElementById('main').appendChild(document.createElement('br'));
@@ -264,6 +272,7 @@ D.Currency = class Currency {
         this.location = location;
         this.condition = condition;
         this.tier = tier;
+        this.mult = new Decimal(1);
         try {
             this.unlocked = this.condition();
         } catch {
@@ -294,6 +303,7 @@ D.Currency = class Currency {
     }
     Tick () {
         this.V.innerHTML = this.name + ': ' + this.amt.toFixed(2).format() + ' (+' + this.gain.toFixed(2).format() + ')';
+        this.amt = this.amt.add(this.gain.mul(this.mult));
         if (!this.unlocked) {
             this.Unlock();
         }

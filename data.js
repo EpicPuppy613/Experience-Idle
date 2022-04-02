@@ -57,55 +57,47 @@ A
         function () {G.gain = G.gain.add(this.inc)}, 
         "xp", function () {return true}, 
         {"inc": new Decimal(1)}, 
-        'p', 0, function () {return this.inc.mul(this.owned)}
+        'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
     ))
     .Buyable(new D.Buyable(
         "XP Absorber II", "absorbs more xp", "xp2", new Decimal(100), 1.55,
         function () {G.gain = G.gain.add(this.inc)}, 
         "xp", function () {return G.level.gte(5)||G.ascensions["lgm"].ascensions.gte(1)}, 
         {"inc": new Decimal(5)}, 
-        'p', 0, function () {return this.inc.mul(this.owned)}
+        'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
     ))
     .Buyable(new D.Buyable(
         "XP Absorber III", "absorbs even more xp", "xp3", new Decimal(1500), 1.6,
         function () {G.gain = G.gain.add(this.inc)}, 
         "xp", function () {return G.level.gte(15)||G.ascensions["lgm"].ascensions.gte(2)}, 
         {"inc": new Decimal(25)}, 
-        'p', 0, function () {return this.inc.mul(this.owned)}
+        'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
     ))
     .Buyable(new D.Buyable(
         "XP Absorber IV", "absorbs a lot of xp", "xp4", new Decimal(20000), 1.65,
         function () {G.gain = G.gain.add(this.inc)}, 
         "xp", function () {return G.level.gte(30)||G.ascensions["lgm"].ascensions.gte(2)}, 
         {"inc": new Decimal(125)}, 
-        'p', 0, function () {return this.inc.mul(this.owned)}
+        'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
     ))
     .Buyable(new D.Buyable(
         "XP Absorber V", "absorbs a ton of xp", "xp5", new Decimal(250000), 1.7,
         function () {G.gain = G.gain.add(this.inc)}, 
         "xp", function () {return G.level.gte(50)||G.ascensions["lgm"].ascensions.gte(3)}, 
         {"inc": new Decimal(625)}, 
-        'p', 0, function () {return this.inc.mul(this.owned)}
+        'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
     ))
     .Buyable(new D.Buyable(
         "XP Accelerator", "increases xp absorbtion rate", "xpa", new Decimal(500), 2,
-        function () {
-            for (var x = 1; x <= 5; x++) {
-                G.buyables["xp" + x].inc = G.buyables["xp" + x].inc.mul(1.4);
-            }
-        },
+        function () {},
         "xp", function () {return G.level.gte(10)||G.ascensions["lgm"].ascensions.gte(1)}, {}, 
-        'p', 0, function () {return 0}
+        'p', 0, 'p', function () {return 0}, function () {return new Decimal(1.5).pow(this.owned)}
     ))
     .Buyable(new D.Buyable(
         "XP Multiplier", "increases xp absorbtion rate", "xpm", new Decimal(10000), 10,
-        function () {
-            for (var x = 1; x <= 5; x++) {
-                G.buyables["xp" + x].inc = G.buyables["xp" + x].inc.mul(2);
-            }
-        },
+        function () {},
         "xp", function () {return G.level.gte(20)||G.ascensions["lgm"].ascensions.gte(2)}, {}, 
-        'p', 0, function () {return 0}
+        'p', 0, 'p', function () {return 0}, function () {return new Decimal(2).pow(this.owned)}
     ))
     //GOLD MINE
     .Ascension(new D.Ascension(
