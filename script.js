@@ -69,7 +69,7 @@ function Main() {
     }
     for (const b in G.buyables) {
         if (G.buyables[b].generate == 'p') G.mult = G.mult.mul(G.buyables[b].mult());
-        else C[G.buyables[b].generate].mult = C[G.buyables[b].generate].mult.add(G.buyables[b].mult());
+        else C[G.buyables[b].generate].mult = C[G.buyables[b].generate].mult.mul(G.buyables[b].mult());
     }
     for (const c in C) {
         C[c].Tick();

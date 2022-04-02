@@ -43,6 +43,7 @@ A.Ascension = function (ascension) {
     var id = ascension.id;
     G.ascensions[id] = ascension;
     G.ascensions[id].A.addEventListener('click', function () {G.ascensions[id].Ascend() });
+    return this;
 }
 
 const D = {};
@@ -99,6 +100,7 @@ D.Buyable = class Buyable {
         this.E.appendChild(this.T);
         this.E.style.display = 'inline-block';
         this.E.style.width = '90%';
+        this.T.style.width = '100%';
         this.T.appendChild(this.N);
         G.panels[this.location].S.appendChild(this.E);
         this.B = document.createElement('button');
@@ -281,6 +283,8 @@ D.Currency = class Currency {
         this.amt = new Decimal(initial);
         this.gain = new Decimal(0);
         this.E = document.createElement('div');
+        this.E.style.display = 'inline-block';
+        this.E.style.width = '90%';
         this.V = document.createElement('strong');
         this.V.innerHTML = name + ': 0 (+0.00)';
         this.E.appendChild(this.V);
@@ -299,11 +303,11 @@ D.Currency = class Currency {
     }
     Unlock() {
         this.unlocked = this.condition();
-        if (this.unlocked) this.E.style.display = '';
+        if (this.unlocked) this.E.style.display = 'inline-block';
     }
     Tick () {
-        this.V.innerHTML = this.name + ': ' + this.amt.toFixed(2).format() + ' (+' + this.gain.toFixed(2).format() + ')';
-        this.amt = this.amt.add(this.gain.mul(this.mult));
+        this.V.innerHTML = this.name + ': ' + this.amt.toFixed(2).format() + ' (+' + this.gain.mul(this.mult).toFixed(2).format() + ')';
+        this.amt = this.amt.add(this.gain.mul(this.mult).div(50));
         if (!this.unlocked) {
             this.Unlock();
         }
@@ -350,6 +354,8 @@ D.Ascension = class Ascension {
             this.unlocked = false;
         }
         this.E = document.createElement('div');
+        this.E.style.display = 'inline-block';
+        this.E.style.width = '90%';
         if (!this.unlocked) this.E.style.display = 'none';
         this.T = document.createElement('h3');
         this.T.innerHTML = this.name;
@@ -381,7 +387,7 @@ D.Ascension = class Ascension {
     Tick() {
         if (!this.unlocked) {
             this.unlocked = this.condition();
-            if (this.unlocked) this.E.style.display = '';
+            if (this.unlocked) this.E.style.display = 'inline-block';
         }
         if (this.target == 'p') {
             if (G.points.gte(this.req)) {
@@ -428,5 +434,36 @@ D.Ascension = class Ascension {
                 G.buyables[b].Reset();
             }
         }
+    }
+}
+
+D.Milestone = class Milestone {
+    /**
+     * A conditional milestone that can be unlocked by a certain condition
+     * @param {String} name - name of the milestone
+     * @param {String} id - unique id for the milestone
+     * @param {Function} condition - function returns true if milestone should be unlocked
+     * @param {Function} milestone - function returns true when milestone should be achieved
+     * @param {String} location - panel container for the milestone
+     * @param {Number} tier - tier of ascension
+     * @param {Boolean} preserve - keep milestone on ascension regardless of tier
+     * @param {Function} onget - function to run when milestone is achieved
+     */
+    constructor (name, id, condition, milestone, location, tier, preserve, onget) {
+        this.name = name;
+        this.id = id;
+        this.condition = condition;
+        this.milestone = milestone;
+        this.location = location;
+        this.tier = tier;
+        this.preserve = preserve;
+        this.onget = onget;
+        try {
+            this.unlocked = this.condition();
+        } catch {
+            this.unlocked = false;
+        }
+        this.E = document.createElement('div');
+        this.E.style.display = 'inline-block';
     }
 }
