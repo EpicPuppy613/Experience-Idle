@@ -1,6 +1,7 @@
 ---
 name: Content Idea
-about: Suggest some sort of content addition
+about: Suggest some sort of content addition for the base game (please note that it
+  is highly recommended to create a mod instead)
 title: 'CONTENT: [Content Name]'
 labels: enhancement
 assignees: EpicPuppy613
