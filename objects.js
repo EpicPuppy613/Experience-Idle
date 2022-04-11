@@ -9,6 +9,16 @@ G.points = new Decimal('10');
 G.buyables = {};
 G.panels = {};
 G.ascensions = {};
+G.milestones = {};
+G.start = performance.now();
+G.log = function (message, color="white") {
+    const T = new Date();
+    const M = document.createElement('span');
+    M.innerHTML = `[${T.toLocaleTimeString()} ; ${(performance.now() - G.start).toFixed(1)}] ` + message;
+    M.style.color = color;
+    E.console.appendChild(M);
+    E.console.appendChild(document.createElement('br'));
+}
 
 const C = {};
 
@@ -19,53 +29,124 @@ E.bar = document.getElementById('barprog');
 E.icon = document.getElementById('icon');
 E.points = document.getElementById('points');
 E.debug = document.getElementById('debug');
-E.devmenu = document.getElementById('dev');
+E.console = document.getElementById('console');
 
-E.devmenu.style.display = 'none';
+document.getElementById("devmenu").style.display = "none";
+document.getElementById("debugmenu").style.display = "none";
+document.getElementById("debugconsole").style.display = "none";
+
+G.log("START INIT");
 
 const A = {};
-A.Buyable = function (buyable) {
-    var id = buyable.id;
-    G.buyables[id] = buyable;
-    G.buyables[id].B.addEventListener('click', function () { G.buyables[id].Buy() });
-    G.buyables[id].M.addEventListener('click', function () { G.buyables[id].BuyMax() });
+/**
+ * A buyable object by using a currency
+ * @param {String} name - the name of the buyable
+ * @param {String} desc - a description of the buyable
+ * @param {String} id - unique id for the buyable
+ * @param {Number} initial - initial price of the buyable
+ * @param {Number} gain - price gain of the buyable
+ * @param {Function} onbuy - execute on purchase of the buyable
+ * @param {String} location - containing panel of the buyable
+ * @param {Function} condition - function that returns true when the buyable should be unlocked
+ * @param {Object} vars - internal variables for the buyable
+ * @param {String} type - purchase currency
+ * @param {Number} tier - tier for resetting on ascension
+ * @param {String} generate - currency to generate
+ * @param {Function} increase - returns amount to gain, most likely going to be (rate * owned)
+ * @param {Function} mult - returns multiplier for the buyable's generation currency
+ */
+A.Buyable = function (name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier, generate, increase, mult) {
+    try {
+        var b = new D.Buyable(name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier, generate, increase, mult);
+        var id = b.id;
+        G.buyables[id] = b;
+        G.buyables[id].B.addEventListener('click', function () { G.buyables[id].Buy() });
+        G.buyables[id].M.addEventListener('click', function () { G.buyables[id].BuyMax() });
+    } catch (err) {G.log("ERROR/BUYABLE: " + err.stack, "#fbb")}
     return this;
 }
-A.Panel = function (panel) {
-    G.panels[panel.id] = panel;
+/**
+ * A panel that contains stuff
+ * @param {String} title - the name of the panel
+ * @param {String} id - a unique id for the panel
+ * @param {String} color1 - top color for the panel gradient
+ * @param {String} color2 - bottom color for the panel gradient
+ * @param {String} color3 - text color for the panel
+ * @param {String} color4 - progress bar color for the panel
+ * @param {Function} condition - function returns true if the panel is unlocked
+ */
+A.Panel = function (title, id, color1, color2, color3, color4, condition) {
+    try {
+        const p = new D.Panel(title, id, color1, color2, color3, color4, condition);
+        G.panels[p.id] = p
+    } catch (err) {G.log("ERROR/PANEL: " + err.stack, "#fbb")}
     return this;
 }
-A.Currency = function (currency) {
-    C[currency.id] = currency;
+/**
+ * A currency that can be used for stuff
+ * @param {String} name - the name of the currency
+ * @param {String} id - the unique id of the currency
+ * @param {Number} initial - the initial amount of the currency
+ * @param {String} location - the containing panel for the currency
+ * @param {Function} condition - function should return true if the currency is unlocked
+ * @param {Number} tier - tier for resetting on ascension
+ */
+A.Currency = function (name, id, initial, location, condition, tier) {
+    try {
+        const c = new D.Currency(name, id, initial, location, condition, tier);
+        C[c.id] = c;
+    } catch (err) {G.log("ERROR/CURRENCY: " + err.stack, "#fbb")}
     return this;
 }
-A.Ascension = function (ascension) {
-    var id = ascension.id;
-    G.ascensions[id] = ascension;
-    G.ascensions[id].A.addEventListener('click', function () {G.ascensions[id].Ascend() });
+/**
+ * reset progress to gain a new currency
+ * @param {String} name - name for the ascension
+ * @param {String} id - unique id for the ascension
+ * @param {String} currency - id of a currency to reward
+ * @param {Number} req - target currency amount required to ascend
+ * @param {String} target - required currency type
+ * @param {Function} scale - scaling for multiple of the new currency
+ * @param {Number} mult - total multiplier for the new currency
+ * @param {Function} condition - function that returns true if the ascension is unlocked
+ * @param {String} location - panel container for the ascension
+ * @param {Number} tier - tier of reset, all lower tiers are reset
+ */
+A.Ascension = function (name, id, currency, req, target, scale, mult, condition, location, tier) {
+    try {
+        const a = new D.Ascension(name, id, currency, req, target, scale, mult, condition, location, tier);
+        var id = a.id;
+        G.ascensions[id] = a;
+        G.ascensions[id].A.addEventListener('click', function () {G.ascensions[id].Ascend() });
+    } catch (err) {G.log("ERROR/ASCENSION: " + err.stack, "#fbb")}
+    return this;
+}
+/**
+ * A conditional milestone that can be unlocked by a certain condition
+ * @param {String} name - name of the milestone
+ * @param {String} desc - description of the milestone
+ * @param {String} id - unique id for the milestone
+ * @param {Function} condition - function returns true if milestone should be unlocked
+ * @param {Function} milestone - function returns true when milestone should be achieved
+ * @param {String} location - panel container for the milestone
+ * @param {Number} tier - tier of ascension
+ * @param {Boolean} preserve - keep milestone on ascension regardless of tier
+ * @param {Function} onget - function to run when milestone is achieved
+ * @param {String} color1 - the uncompleted color of the milestone
+ * @param {String} color2 - the completed color of the milestone
+ */
+A.Milestone = function (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2) {
+    try {
+        const m = new D.Milestone(name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2);
+        G.milestones[m.id] = m
+    }
+    catch (err) {G.log("ERROR/MILESTONE: " + err.stack, "#fbb")}
     return this;
 }
 
 const D = {};
 D.Buyable = class Buyable {
-    /**
-     * A buyable object by using a currency
-     * @param {String} name - the name of the buyable
-     * @param {String} desc - a description of the buyable
-     * @param {String} id - unique id for the buyable
-     * @param {Number} initial - initial price of the buyable
-     * @param {Number} gain - price gain of the buyable
-     * @param {Function} onbuy - execute on purchase of the buyable
-     * @param {String} location - containing panel of the buyable
-     * @param {Function} condition - function that returns true when the buyable should be unlocked
-     * @param {Object} vars - internal variables for the buyable
-     * @param {String} type - purchase currency
-     * @param {Number} tier - tier for resetting on ascension
-     * @param {String} generate - currency to generate
-     * @param {Function} increase - returns amount to gain, most likely going to be (rate * owned)
-     * @param {Function} mult - returns multiplier for the buyable's generation currency
-     */
     constructor(name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier, generate, increase, mult) {
+        G.log(`INIT/BUYABLE: ${id}, ${name}, ${initial.toFixed(2)}, ${location}`, "#cfc");
         this.name = name;
         this.desc = desc;
         this.id = id;
@@ -216,17 +297,8 @@ D.Buyable = class Buyable {
     }
 }
 D.Panel = class Panel {
-    /**
-     * A panel that contains stuff
-     * @param {String} title - the name of the panel
-     * @param {String} id - a unique id for the panel
-     * @param {String} color1 - top color for the panel gradient
-     * @param {String} color2 - bottom color for the panel gradient
-     * @param {String} color3 - text color for the panel
-     * @param {String} color4 - progress bar color for the panel
-     * @param {Function} condition - function returns true if the panel is unlocked
-     */
     constructor(title, id, color1, color2, color3, color4, condition) {
+        G.log(`INIT/PANEL: ${id}, ${title}`, "#ffc");
         this.title = title;
         this.id = id;
         this.color = [color1, color2, color3, color4];
@@ -248,7 +320,6 @@ D.Panel = class Panel {
         this.S.style.columns = '2';
         this.E.appendChild(this.S);
         document.getElementById('main').appendChild(this.E);
-        document.getElementById('main').appendChild(document.createElement('br'));
     }
     Unlock() {
         if (!this.unlocked) {
@@ -258,16 +329,8 @@ D.Panel = class Panel {
     }
 }
 D.Currency = class Currency {
-    /**
-     * A currency that can be used for stuff
-     * @param {String} name - the name of the currency
-     * @param {String} id - the unique id of the currency
-     * @param {Number} initial - the initial amount of the currency
-     * @param {String} location - the containing panel for the currency
-     * @param {Function} condition - function should return true if the currency is unlocked
-     * @param {Number} tier - tier for resetting on ascension
-     */
     constructor(name, id, initial, location, condition, tier) {
+        G.log(`INIT/CURRENCY: ${id}, ${name}, ${initial.toFixed(2)}, ${location}`, "#ccf");
         this.name = name;
         this.id = id;
         this.initial = initial;
@@ -322,20 +385,8 @@ D.Currency = class Currency {
 }
 
 D.Ascension = class Ascension {
-    /**
-     * reset progress to gain a new currency
-     * @param {String} name - name for the ascension
-     * @param {String} id - unique id for the ascension
-     * @param {String} currency - id of a currency to reward
-     * @param {Number} req - target currency amount required to ascend
-     * @param {String} target - required currency type
-     * @param {Function} scale - scaling for multiple of the new currency
-     * @param {Number} mult - total multiplier for the new currency
-     * @param {Function} condition - function that returns true if the ascension is unlocked
-     * @param {String} location - panel container for the ascension
-     * @param {Number} tier - tier of reset, all lower tiers are reset
-     */
     constructor(name, id, currency, req, target, scale, mult, condition, location, tier) {
+        G.log(`INIT/ASCNESION: ${id}, ${name}, ${currency}, ${target}, ${location}`, "#cff");
         this.name = name;
         this.id = id;
         this.currency = currency;
@@ -357,7 +408,7 @@ D.Ascension = class Ascension {
         this.E.style.display = 'inline-block';
         this.E.style.width = '90%';
         if (!this.unlocked) this.E.style.display = 'none';
-        this.T = document.createElement('h3');
+        this.T = document.createElement('h2');
         this.T.innerHTML = this.name;
         this.E.appendChild(this.T);
         this.S = document.createElement('p');
@@ -429,35 +480,36 @@ D.Ascension = class Ascension {
                 C[c].Reset();
             }
         }
+        for (const a in G.ascensions) {
+            if (G.ascensions[a].tier < this.tier) {
+                G.ascensions[a].Reset();
+            }
+        }
         for (const b in G.buyables) {
             if (G.buyables[b].tier < this.tier) {
                 G.buyables[b].Reset();
             }
         }
     }
+    Reset() {
+        this.ascensions = new Decimal(0);
+    }
 }
 
 D.Milestone = class Milestone {
-    /**
-     * A conditional milestone that can be unlocked by a certain condition
-     * @param {String} name - name of the milestone
-     * @param {String} id - unique id for the milestone
-     * @param {Function} condition - function returns true if milestone should be unlocked
-     * @param {Function} milestone - function returns true when milestone should be achieved
-     * @param {String} location - panel container for the milestone
-     * @param {Number} tier - tier of ascension
-     * @param {Boolean} preserve - keep milestone on ascension regardless of tier
-     * @param {Function} onget - function to run when milestone is achieved
-     */
-    constructor (name, id, condition, milestone, location, tier, preserve, onget) {
+    constructor (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2) {
+        G.log(`INIT/MILESTONE: ${id}, ${name}, ${location}`, "#fcf");
         this.name = name;
+        this.desc = desc;
         this.id = id;
         this.condition = condition;
         this.milestone = milestone;
+        this.color = [color1, color2];
         this.location = location;
         this.tier = tier;
         this.preserve = preserve;
         this.onget = onget;
+        this.achieved = false;
         try {
             this.unlocked = this.condition();
         } catch {
@@ -465,5 +517,14 @@ D.Milestone = class Milestone {
         }
         this.E = document.createElement('div');
         this.E.style.display = 'inline-block';
+        this.E.classList.add('milestone');
+        this.T = document.createElement('h3');
+        this.T.innerHTML = this.name;
+        this.D = document.createElement('span');
+        this.D.innerHTML = this.desc;
+        this.E.style.backgroundColor = this.color[0];
+        this.E.appendChild(this.T);
+        this.E.appendChild(this.D);
+        G.panels[this.location].S.appendChild(this.E);
     }
 }

@@ -121,12 +121,12 @@ function UpdateUI() {
     }
     E.icon.href = 'icon/' + high + '.png';
     E.debug.innerHTML = `
-    POINTS: layer ${G.points.layer}, mag ${G.points.mag.toFixed(2)}, exp ${G.points.exponent}<br>
-    XP: ${G.xp.toFixed(2)} layer ${G.xp.layer}, mag ${G.xp.mag.toFixed(2)}, exp ${G.xp.exponent}
+    POINTS: layer ${G.points.layer}, exp ${G.points.exponent}, gain ${G.gain}, mult ${G.mult}<br>
+    XP: ${G.xp.toFixed(2)}, layer ${G.xp.layer}, exp ${G.xp.exponent}
     `;
-    for (const a in G.ascensions) {
-        E.debug.innerHTML += `<br>${a}: 
-        currency ${G.ascensions[a].currency} reward ${G.ascensions[a].reward} target ${G.ascensions[a].target}`;
+    for (const c in C) {
+        E.debug.innerHTML += `<br>${c}: 
+        amt ${C[c].amt.toFixed(2)}, gain ${C[c].gain}, mult ${C[c].mult}`;
     }
 }
 
@@ -156,10 +156,24 @@ K = "";
 
 document.addEventListener('keydown', function (e) {
     if (e.key == 'Enter') {
-        if (K == "devhax") {
-            E.devmenu.style.display = '';
-        } else if (K == "nohax") {
-            E.devmenu.style.display = 'none';
+        switch (K) {
+            case "devhax":
+                document.getElementById("devmenu").style.display = '';
+                break;
+            case "nohax":
+                document.getElementById("devmenu").style.display = 'none';
+                break;
+            case "debug":
+                document.getElementById("debugmenu").style.display = '';
+                break;
+            case "nobug":
+                document.getElementById("debugmenu").style.display = 'none';
+                break;
+            case "console":
+                document.getElementById("debugconsole").style.display = '';
+                break;
+            case "nocon":
+                document.getElementById("debugconsole").style.display = 'none';
         }
         K = "";
     } else {
