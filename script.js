@@ -64,15 +64,27 @@ function Main() {
         C[c].gain = new Decimal(0);
     }
     for (const b in G.buyables) {
-        if (G.buyables[b].generate == 'p') G.gain = G.gain.add(G.buyables[b].increase());
-        else C[G.buyables[b].generate].gain = C[G.buyables[b].generate].gain.add(G.buyables[b].increase());
-    }
-    for (const b in G.buyables) {
-        if (G.buyables[b].generate == 'p') G.mult = G.mult.mul(G.buyables[b].mult());
-        else C[G.buyables[b].generate].mult = C[G.buyables[b].generate].mult.mul(G.buyables[b].mult());
+        if (G.buyables[b].generate == 'p') {
+            G.gain = G.gain.add(G.buyables[b].increase());
+            G.mult = G.mult.mul(G.buyables[b].mult());
+        } else {
+            C[G.buyables[b].generate].gain = C[G.buyables[b].generate].gain.add(G.buyables[b].increase());
+            C[G.buyables[b].generate].mult = C[G.buyables[b].generate].mult.mul(G.buyables[b].mult());
+        }
     }
     for (const c in C) {
         C[c].Tick();
+    }
+    for (const m in G.milestones) {
+        G.milestones[m].Tick();
+        if (!G.milestones[m].achieved) continue;
+        if (G.milestones[m].target == 'p') {
+            G.gain = G.gain.add(G.milestones[m].gain());
+            G.mult = G.mult.mul(G.milestones[m].mult());
+        } else {
+            C[G.milestones[m].target].gain = C[G.milestones[m].target].gain.add(G.milestones[m].gain());
+            C[G.milestones[m].target].mult = C[G.milestones[m].target].mult.mul(G.milestones[m].mult());
+        }
     }
     G.xp = G.xp.add(G.gain.mul(G.mult));
     G.points = G.points.add(G.gain.mul(G.mult).div(50));
@@ -150,7 +162,16 @@ function DevGain() {
     }
 }
 
-G.loop = setInterval(Main, 1000 / 50);
+G.loop = setInterval(function () {
+    try {Main()} catch (err) {
+        G.log("ERROR/MAIN: " + err.stack, "#faa");
+        G.errors++;
+        if (G.errors >= G.limit) {
+            G.log("ERROR/MAIN: ERROR LIMIT EXCEDED, TERMINATING", "#f55");
+            clearInterval(G.loop);
+        }
+    }
+}, 1000 / 50);
 
 K = "";
 
@@ -171,6 +192,7 @@ document.addEventListener('keydown', function (e) {
                 break;
             case "console":
                 document.getElementById("debugconsole").style.display = '';
+                E.console.scrollTop = E.console.scrollHeight - E.console.clientHeight;
                 break;
             case "nocon":
                 document.getElementById("debugconsole").style.display = 'none';

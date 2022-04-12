@@ -7,6 +7,8 @@ G.gain = new Decimal(0);
 G.mult = new Decimal(1);
 G.points = new Decimal('10');
 G.buyables = {};
+G.errors = 0;
+G.limit = 1;
 G.panels = {};
 G.ascensions = {};
 G.milestones = {};
@@ -14,11 +16,22 @@ G.start = performance.now();
 G.log = function (message, color="white") {
     const T = new Date();
     const M = document.createElement('span');
-    M.innerHTML = `[${T.toLocaleTimeString()} ; ${(performance.now() - G.start).toFixed(1)}] ` + message;
+    const passed = performance.now() - G.start;
+    const scroll = E.console.scrollTop + E.console.clientHeight >= E.console.scrollHeight;
+    if (passed < 1000) {
+        M.innerHTML = `[${T.toLocaleTimeString()} ; ${(performance.now() - G.start).toFixed(1)} ms] ` + message;
+    } else if (passed < 60000) {
+        M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/1000).toFixed(2)} s] ` + message;
+    } else {
+        M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/60000).toFixed(2)} m] ` + message;
+    }
     M.style.color = color;
     E.console.appendChild(M);
     E.console.appendChild(document.createElement('br'));
-}
+    if (scroll) {
+        E.console.scrollTop = E.console.scrollHeight - E.console.clientHeight;
+    }
+} 
 
 const C = {};
 
@@ -62,7 +75,10 @@ A.Buyable = function (name, desc, id, initial, gain, onbuy, location, condition,
         G.buyables[id] = b;
         G.buyables[id].B.addEventListener('click', function () { G.buyables[id].Buy() });
         G.buyables[id].M.addEventListener('click', function () { G.buyables[id].BuyMax() });
-    } catch (err) {G.log("ERROR/BUYABLE: " + err.stack, "#fbb")}
+    } catch (err) {
+        G.log("ERROR/BUYABLE: " + err.stack, "#faa");
+        G.errors++;
+    }
     return this;
 }
 /**
@@ -79,7 +95,10 @@ A.Panel = function (title, id, color1, color2, color3, color4, condition) {
     try {
         const p = new D.Panel(title, id, color1, color2, color3, color4, condition);
         G.panels[p.id] = p
-    } catch (err) {G.log("ERROR/PANEL: " + err.stack, "#fbb")}
+    } catch (err) {
+        G.log("ERROR/PANEL: " + err.stack, "#faa");
+        G.errors++;
+    }
     return this;
 }
 /**
@@ -95,7 +114,10 @@ A.Currency = function (name, id, initial, location, condition, tier) {
     try {
         const c = new D.Currency(name, id, initial, location, condition, tier);
         C[c.id] = c;
-    } catch (err) {G.log("ERROR/CURRENCY: " + err.stack, "#fbb")}
+    } catch (err) {
+        G.log("ERROR/CURRENCY: " + err.stack, "#faa");
+        G.errors++;
+    }
     return this;
 }
 /**
@@ -117,7 +139,10 @@ A.Ascension = function (name, id, currency, req, target, scale, mult, condition,
         var id = a.id;
         G.ascensions[id] = a;
         G.ascensions[id].A.addEventListener('click', function () {G.ascensions[id].Ascend() });
-    } catch (err) {G.log("ERROR/ASCENSION: " + err.stack, "#fbb")}
+    } catch (err) {
+        G.log("ERROR/ASCENSION: " + err.stack, "#faa");
+        G.errors++;
+    }
     return this;
 }
 /**
@@ -137,12 +162,15 @@ A.Ascension = function (name, id, currency, req, target, scale, mult, condition,
  * @param {Function} gain - returns amount of gain to add to the target currency
  * @param {Function} mult - returns multiplier for the target currency
  */
-A.Milestone = function (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2) {
+A.Milestone = function (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2, target, gain, mult) {
     try {
-        const m = new D.Milestone(name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2);
+        const m = new D.Milestone(name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2, target, gain, mult);
         G.milestones[m.id] = m
     }
-    catch (err) {G.log("ERROR/MILESTONE: " + err.stack, "#fbb")}
+    catch (err) {
+        G.log("ERROR/MILESTONE: " + err.stack, "#faa");
+        G.errors++;
+    }
     return this;
 }
 
@@ -471,6 +499,14 @@ D.Ascension = class Ascension {
         }
     }
     Ascend() {
+        var message = `INFO/ASCEND: ${this.id}, ${this.name}, target: `;
+        if (this.target == 'p') {
+            message += G.points.toFixed(2).format();
+        } else {
+            message += C[this.target].amt.toFixed(2).format();
+        }
+        message += `, currency: ${C[this.currency].amt.toFixed(2).format()}, reward: ${this.reward.toFixed(2).format()}`;
+        G.log(message, "#8df");
         this.ascensions = this.ascensions.add(1);
         C[this.currency].amt = C[this.currency].amt.add(this.reward);
         G.points = new Decimal(10);
@@ -493,6 +529,11 @@ D.Ascension = class Ascension {
                 G.buyables[b].Reset();
             }
         }
+        for (const m in G.milestones) {
+            if (G.milestones[m].tier < this.tier && !G.milestones[m].preserve) {
+                G.milestones[m].Reset();
+            }
+        }
     }
     Reset() {
         this.ascensions = new Decimal(0);
@@ -501,7 +542,7 @@ D.Ascension = class Ascension {
 
 D.Milestone = class Milestone {
     constructor (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2, target, gain, mult) {
-        G.log(`INIT/MILESTONE: ${id}, ${name}, ${location}`, "#fcf");
+        G.log(`INIT/MILESTONE: ${id}, ${name}, ${location}, ${target}`, "#fcf");
         this.name = name;
         this.desc = desc;
         this.id = id;
@@ -512,7 +553,14 @@ D.Milestone = class Milestone {
         this.tier = tier;
         this.preserve = preserve;
         this.onget = onget;
-        this.achieved = false;
+        this.target = target;
+        this.gain = gain;
+        this.mult = mult;
+        try {
+            this.achieved = this.milestone();
+        } catch {
+            this.achieved = false;
+        }
         try {
             this.unlocked = this.condition();
         } catch {
@@ -530,10 +578,14 @@ D.Milestone = class Milestone {
         this.E.appendChild(this.D);
         G.panels[this.location].S.appendChild(this.E);
     }
-    Tick () {
-
+    Tick() {
+        if (!this.achieved) {
+            this.achieved = this.milestone();
+            if (this.achieved) this.E.style.backgroundColor = this.color[1];
+        }
     }
-    Reset () {
-
+    Reset() {
+        this.achieved = false;
+        this.E.style.backgroundColor = this.color[0];
     }
 }
