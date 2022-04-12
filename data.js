@@ -147,5 +147,6 @@ A
 )
 .Milestone(
     "Small Cargo Post", "1 Crates: +25% xp", "csp1", function () {return C.gold.amt.gte(1e14)},
-    function () {return C.crates.amt.gte(1)}, "cargo", 2, false, function () {}, "#110700", "#530"
+    function () {return C.crates.amt.gte(1)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "p", function () {return 0}, function () {return new Decimal(1.25)} 
 )

@@ -133,6 +133,9 @@ A.Ascension = function (name, id, currency, req, target, scale, mult, condition,
  * @param {Function} onget - function to run when milestone is achieved
  * @param {String} color1 - the uncompleted color of the milestone
  * @param {String} color2 - the completed color of the milestone
+ * @param {String} target - the target currency to modify
+ * @param {Function} gain - returns amount of gain to add to the target currency
+ * @param {Function} mult - returns multiplier for the target currency
  */
 A.Milestone = function (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2) {
     try {
@@ -497,7 +500,7 @@ D.Ascension = class Ascension {
 }
 
 D.Milestone = class Milestone {
-    constructor (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2) {
+    constructor (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2, target, gain, mult) {
         G.log(`INIT/MILESTONE: ${id}, ${name}, ${location}`, "#fcf");
         this.name = name;
         this.desc = desc;
@@ -526,5 +529,11 @@ D.Milestone = class Milestone {
         this.E.appendChild(this.T);
         this.E.appendChild(this.D);
         G.panels[this.location].S.appendChild(this.E);
+    }
+    Tick () {
+
+    }
+    Reset () {
+
     }
 }
