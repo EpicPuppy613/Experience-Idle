@@ -146,7 +146,52 @@ A
     1, function() {return C.gold.amt.gte(1e14)}, "cargo", 2
 )
 .Milestone(
-    "Small Cargo Post", "1 Crates: +25% xp", "csp1", function () {return C.gold.amt.gte(1e14)},
+    "Small Cargo Post", "1 Crates: +20% xp", "csp1", function () {return G.panels.cargo.unlocked},
     function () {return C.crates.amt.gte(1)}, "cargo", 2, false, function () {}, "#110700", "#530",
-    "p", function () {return 0}, function () {return new Decimal(1.25)} 
+    "p", function () {return 0}, function () {return new Decimal(1.2)} 
+)
+.Milestone(
+    "Medium Cargo Post", "3 Crates: +40% gold", "csp2", function () {return C.crates.amt.gte(1)},
+    function () {return C.crates.amt.gte(3)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "gold", function () {return 0}, function () {return new Decimal(1.4)} 
+)
+.Milestone(
+    "Large Cargo Post", "5 Crates: +60% xp", "csp3", function () {return C.crates.amt.gte(3)},
+    function () {return C.crates.amt.gte(5)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "p", function () {return 0}, function () {return new Decimal(1.6)} 
+)
+.Milestone(
+    "Small Cargo Station", "10 Crates: +80% gold", "csp4", function () {return C.crates.amt.gte(5)},
+    function () {return C.crates.amt.gte(10)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "gold", function () {return 0}, function () {return new Decimal(1.8)} 
+)
+.Milestone(
+    "Medium Cargo Station", "25 Crates: +100% xp", "csp5", function () {return C.crates.amt.gte(10)},
+    function () {return C.crates.amt.gte(25)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "p", function () {return 0}, function () {return new Decimal(2)} 
+)
+.Milestone(
+    "Large Cargo Station", "50 Crates: +120% gold", "csp6", function () {return C.crates.amt.gte(25)},
+    function () {return C.crates.amt.gte(50)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "gold", function () {return 0}, function () {return new Decimal(2.2)} 
+)
+.Milestone(
+    "Small Cargo Warehouse", "100 Crates: +140% xp", "csp7", function () {return C.crates.amt.gte(50)},
+    function () {return C.crates.amt.gte(100)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "p", function () {return 0}, function () {return new Decimal(2.4)} 
+)
+.Milestone(
+    "Medium Cargo Warehouse", "250 Crates: +160% gold", "csp8", function () {return C.crates.amt.gte(100)},
+    function () {return C.crates.amt.gte(250)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "gold", function () {return 0}, function () {return new Decimal(2.6)} 
+)
+.Milestone(
+    "Large Cargo Warehouse", "500 Crates: +180% xp", "csp9", function () {return C.crates.amt.gte(250)},
+    function () {return C.crates.amt.gte(500)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "p", function () {return 0}, function () {return new Decimal(2.8)} 
+)
+.Milestone(
+    "Cargo Supercenter", "1000 Crates: +200% gold", "csp10", function () {return C.crates.amt.gte(500)},
+    function () {return C.crates.amt.gte(1000)}, "cargo", 2, false, function () {}, "#110700", "#530",
+    "gold", function () {return 0}, function () {return new Decimal(3)} 
 )

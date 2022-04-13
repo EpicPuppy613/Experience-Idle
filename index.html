@@ -19,7 +19,31 @@
         </div>
         <h3 id="points">Pts: 0</h3>
         <div id="dev">
-            <div id="debugmenu"><strong>DEBUG MENU</strong><br><span id="debug"></span><br></div>
+            <div id="debugmenu">
+                <strong>DEBUG MENU</strong><br>
+                Currency: 
+                <select id="currencyselect">
+                    <option value=" ">Nothing</option>
+                    <option value="p">XP/Points</option>
+                    <option value="devgain">Dev Gain</option>
+                </select><br>
+                <span id="currencyinfo"></span><br>
+                Buyable: 
+                <select id="buyableselect">
+                    <option value=" ">Nothing</option>
+                </select><br>
+                <span id="buyableinfo"></span><br>
+                Ascension: 
+                <select id="ascensionselect">
+                    <option value=" ">Nothing</option>
+                </select><br>
+                <span id="ascensiponinfo"></span><br>
+                Milestone: 
+                <select id="milestoneselect">
+                    <option value=" ">Nothing</option>
+                </select><br>
+                <span id="milestoneinfo"></span><br>
+            </div>
             <div id="devmenu">
                 <strong>DEV MENU</strong><br>
                 Give Currency: <input id="give" maxlength="10"> <select id="givecurrency">

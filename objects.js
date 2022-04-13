@@ -5,13 +5,14 @@ G.need = new Decimal(500);
 G.percent = 0;
 G.gain = new Decimal(0);
 G.mult = new Decimal(1);
-G.points = new Decimal('10');
+G.points = new Decimal(10);
 G.buyables = {};
 G.errors = 0;
 G.limit = 1;
 G.panels = {};
 G.ascensions = {};
 G.milestones = {};
+G.devgain = {};
 G.start = performance.now();
 G.log = function (message, color="white") {
     const T = new Date();
@@ -41,7 +42,6 @@ E.prog = document.getElementById('lvlprog');
 E.bar = document.getElementById('barprog');
 E.icon = document.getElementById('icon');
 E.points = document.getElementById('points');
-E.debug = document.getElementById('debug');
 E.console = document.getElementById('console');
 
 document.getElementById("devmenu").style.display = "none";
@@ -561,19 +561,20 @@ D.Milestone = class Milestone {
         } catch {
             this.achieved = false;
         }
-        try {
-            this.unlocked = this.condition();
-        } catch {
-            this.unlocked = false;
-        }
         this.E = document.createElement('div');
-        this.E.style.display = 'inline-block';
         this.E.classList.add('milestone');
         this.T = document.createElement('h3');
         this.T.innerHTML = this.name;
         this.D = document.createElement('span');
         this.D.innerHTML = this.desc;
         this.E.style.backgroundColor = this.color[0];
+        try {
+            this.unlocked = this.condition();
+        } catch {
+            this.unlocked = false;
+        }
+        if (!this.unlocked) this.E.style.display = 'none';
+        else this.E.style.display = 'inline-block';
         this.E.appendChild(this.T);
         this.E.appendChild(this.D);
         G.panels[this.location].S.appendChild(this.E);
@@ -583,9 +584,15 @@ D.Milestone = class Milestone {
             this.achieved = this.milestone();
             if (this.achieved) this.E.style.backgroundColor = this.color[1];
         }
+        if (!this.unlocked) {
+            this.unlocked = this.condition();
+            if (this.unlocked) this.E.style.display = 'inline-block';
+        }
     }
     Reset() {
         this.achieved = false;
         this.E.style.backgroundColor = this.color[0];
+        this.unlocked = this.condition();
+        if (!this.unlocked) this.E.style.display = 'none';
     }
 }

@@ -1,3 +1,6 @@
+const regex = /\d\.\d(?=e\d+)/;
+const digit = /(?<!\.|\d)\d(?=e\d+)/;
+
 //COLUMN CONFIGURATION
 var width = window.innerWidth;
 document.getElementById('main').style.columnCount = 3;
@@ -20,13 +23,13 @@ window.addEventListener('resize', function (e) {
 });
 
 String.prototype.format = function () {
-    return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+    return this.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 };
 
 String.prototype.formatZeros = function () {
-    if (!(/[0-9]+(\.)[0-9](?=e[0-9]+)/).test(this)) return this;
-    var match = (/[0-9]+(\.)[0-9](?=e[0-9]+)/).match(this)[0];
-    return this.replace(/[0-9]+(\.)[0-9](?=e[0-9]+)/, match + '0');
+    if (regex.test(this)) return this.replace(regex, this.match(regex)[0] + "0");
+    if (digit.test(this)) return this.replace(digit, this.match(digit) + ".00");
+    return this;
 };
 
 //SCALING CONFIGURATION
@@ -62,6 +65,13 @@ function Main() {
     for (const c in C) {
         C[c].mult = new Decimal(1);
         C[c].gain = new Decimal(0);
+    }
+    for (const c in G.devgain) {
+        if (c == 'p') {
+            G.gain = G.gain.add(G.devgain.p);
+        } else {
+            C[c].gain = C[c].gain.add(G.devgain[c]);
+        }
     }
     for (const b in G.buyables) {
         if (G.buyables[b].generate == 'p') {
@@ -114,13 +124,14 @@ function Main() {
         G.buyables[b].Update();
     }
     UpdateUI();
+    CurrencyDebug();
 }
 
 function UpdateUI() {
     E.level.innerHTML = 'Level ' + G.level.toFixed(0).format();
     E.prog.innerHTML = G.percent + '% (+' + G.gain.mul(G.mult).div(G.need).mul(5000).toFixed(2).format() + '%)';
     E.bar.style.width = Math.min(G.percent, 100) + '%';
-    var points = G.points.toFixed(2).format().formatZeros();
+    var points = G.points.toFixed(2).formatZeros().format();
     var gain = G.gain.mul(G.mult).toFixed(2).format();
     E.points.innerHTML = 'Points: ' + points + ' (+' +
         gain + ')';
@@ -132,33 +143,54 @@ function UpdateUI() {
         }
     }
     E.icon.href = 'icon/' + high + '.png';
-    E.debug.innerHTML = `
-    POINTS: layer ${G.points.layer}, exp ${G.points.exponent}, gain ${G.gain}, mult ${G.mult}<br>
-    XP: ${G.xp.toFixed(2)}, layer ${G.xp.layer}, exp ${G.xp.exponent}
-    `;
-    for (const c in C) {
-        E.debug.innerHTML += `<br>${c}: 
-        amt ${C[c].amt.toFixed(2)}, gain ${C[c].gain}, mult ${C[c].mult}`;
+}
+
+function CurrencyDebug() {
+    const currencydebug = document.getElementById('currencyselect').value;
+    if (currencydebug == ' ') return;
+    if (currencydebug == 'p') {
+        document.getElementById('currencyinfo').innerHTML = JSON.stringify({
+            points: G.points.toFixed(2).formatZeros().format(), 
+            gain: G.gain.toFixed(2).formatZeros().format(), 
+            mult: G.mult.toFixed(2).formatZeros().format(), 
+            xp: G.xp.toFixed(2).formatZeros().format()
+        });
+    } else if (currencydebug == 'devgain') {
+        document.getElementById('currencyinfo').innerHTML = JSON.stringify(G.devgain);
     }
 }
 
 function DevGive() {
+    try {
     const currency = document.getElementById('givecurrency').value;
     if (currency == 'p') {
         G.points = G.points.add(document.getElementById('give').value);
     }
     else {
         C[currency].amt = C[currency].amt.add(document.getElementById('give').value);
+    }}
+    catch (err) {
+        G.log("ERROR/GIVE: " + err.stack, "#faa");
     }
 }
 
 function DevGain() {
+    try {
     const currency = document.getElementById('gaincurrency').value;
     if (currency == 'p') {
-        G.gain = G.gain.add(document.getElementById('gain').value);
+        if (G.devgain.p == undefined) {
+            G.devgain.p = new Decimal(0);
+        }
+        G.devgain.p = G.devgain.p.add(document.getElementById('gain').value);
     }
     else {
-        C[currency].gain = C[currency].gain.add(document.getElementById('gain').value);
+        if (G.devgain[currency] == undefined) {
+            G.devgain[currency] = new Decimal(0);
+        }
+        G.devgain[currency] = G.devgain[currency].add(document.getElementById('gain').value);
+    }}
+    catch (err) {
+        G.log("ERROR/GAIN:" + err.stack, "#faa");
     }
 }
 
