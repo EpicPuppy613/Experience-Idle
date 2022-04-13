@@ -206,6 +206,10 @@ D.Buyable = class Buyable {
         this.E = document.createElement('div');
         this.T = document.createElement('p');
         this.N = document.createElement('h3');
+        this.DO = document.createElement('option');
+        this.DO.innerHTML = this.name;
+        this.DO.value = this.id;
+        G.panels[this.location].BO.appendChild(this.DO);
         this.D = document.createElement('span');
         this.D.innerHTML = this.desc;
         this.N.innerHTML = this.name;
@@ -343,6 +347,18 @@ D.Panel = class Panel {
         if (!this.unlocked) this.E.style.display = 'none';
         this.T = document.createElement('h2');
         this.T.innerHTML = this.title;
+        this.BO = document.createElement('optgroup');
+        this.CO = document.createElement('optgroup');
+        this.AO = document.createElement('optgroup');
+        this.MO = document.createElement('optgroup');
+        this.BO.label = this.title;
+        this.CO.label = this.title;
+        this.AO.label = this.title;
+        this.MO.label = this.title;
+        document.getElementById('buyableselect').appendChild(this.BO);
+        document.getElementById('currencyselect').appendChild(this.CO);
+        document.getElementById('ascensionselect').appendChild(this.AO);
+        document.getElementById('milestoneselect').appendChild(this.MO);
         this.E.appendChild(this.T);
         this.E.style.background = 'linear-gradient(' + this.color[0] + ',' + this.color[1] + ')';
         this.E.style.color = this.color[2];
@@ -382,6 +398,10 @@ D.Currency = class Currency {
         this.V = document.createElement('strong');
         this.V.innerHTML = name + ': 0 (+0.00)';
         this.E.appendChild(this.V);
+        this.DO = document.createElement('option');
+        this.DO.innerHTML = this.name;
+        this.DO.value = this.id;
+        G.panels[this.location].CO.appendChild(this.DO);
         this.GC = document.createElement('option');
         this.GC.value = id;
         this.GC.innerHTML = name;
@@ -442,6 +462,10 @@ D.Ascension = class Ascension {
         this.T = document.createElement('h2');
         this.T.innerHTML = this.name;
         this.E.appendChild(this.T);
+        this.DO = document.createElement('option');
+        this.DO.innerHTML = this.name;
+        this.DO.value = this.id;
+        G.panels[this.location].AO.appendChild(this.DO);
         this.S = document.createElement('p');
         this.N = document.createElement('strong');
         this.N.innerHTML = 'Requires: ';
@@ -568,6 +592,10 @@ D.Milestone = class Milestone {
         this.D = document.createElement('span');
         this.D.innerHTML = this.desc;
         this.E.style.backgroundColor = this.color[0];
+        this.DO = document.createElement('option');
+        this.DO.innerHTML = this.name;
+        this.DO.value = this.id;
+        G.panels[this.location].MO.appendChild(this.DO);
         try {
             this.unlocked = this.condition();
         } catch {

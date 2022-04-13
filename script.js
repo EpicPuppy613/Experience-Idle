@@ -1,5 +1,5 @@
 const regex = /\d\.\d(?=e\d+)/;
-const digit = /(?<!\.|\d)\d(?=e\d+)/;
+const digit = /^\d(?=e\d+)/;
 
 //COLUMN CONFIGURATION
 var width = window.innerWidth;
@@ -124,7 +124,6 @@ function Main() {
         G.buyables[b].Update();
     }
     UpdateUI();
-    CurrencyDebug();
 }
 
 function UpdateUI() {
@@ -147,8 +146,8 @@ function UpdateUI() {
 
 function CurrencyDebug() {
     const currencydebug = document.getElementById('currencyselect').value;
-    if (currencydebug == ' ') return;
-    if (currencydebug == 'p') {
+    if (currencydebug == ' ') document.getElementById('currencyinfo').innerHTML = '';
+    else if (currencydebug == 'p') {
         document.getElementById('currencyinfo').innerHTML = JSON.stringify({
             points: G.points.toFixed(2).formatZeros().format(), 
             gain: G.gain.toFixed(2).formatZeros().format(), 
@@ -157,7 +156,22 @@ function CurrencyDebug() {
         });
     } else if (currencydebug == 'devgain') {
         document.getElementById('currencyinfo').innerHTML = JSON.stringify(G.devgain);
+    } else {
+        document.getElementById('currencyinfo').innerHTML = JSON.stringify(C[currencydebug]);
     }
+}
+
+function RenderDebug() {
+    CurrencyDebug();
+    const buyabledebug = document.getElementById('buyableselect').value;
+    if (buyabledebug == ' ') document.getElementById('buyableinfo').innerHTML = '';
+    else document.getElementById('buyableinfo').innerHTML = JSON.stringify(G.buyables[buyabledebug]);
+    const ascensiondebug = document.getElementById('ascensionselect').value;
+    if (ascensiondebug == ' ') document.getElementById('ascensioninfo').innerHTML = ' ';
+    else document.getElementById('ascensioninfo').innerHTML = JSON.stringify(G.ascensions[ascensiondebug]);
+    const milestonedebug = document.getElementById('milestoneselect').value;
+    if (milestonedebug == ' ') document.getElementById('milestoneinfo').innerHTML = ' ';
+    else document.getElementById('milestoneinfo').innerHTML = JSON.stringify(G.milestones[milestonedebug]);
 }
 
 function DevGive() {
@@ -202,6 +216,13 @@ G.loop = setInterval(function () {
             G.log("ERROR/MAIN: ERROR LIMIT EXCEDED, TERMINATING", "#f55");
             clearInterval(G.loop);
         }
+    }
+}, 1000 / 50);
+
+G.debugloop = setInterval(function () {
+    try {RenderDebug()} catch (err) {
+        G.log("ERROR/DEBUG: " + err.stack, "#f77");
+        clearInterval(G.debugloop);
     }
 }, 1000 / 50);
 
