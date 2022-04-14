@@ -264,17 +264,19 @@ D.Buyable = class Buyable {
         this.A = document.createElement('span');
         this.A.innerHTML = ' Buyable: 0';
         this.PC = document.createElement('td');
-        this.PC.style.width = '30%';
+        this.PC.style.width = '25%';
         this.P = document.createElement('div');
         this.P.classList.add('progress-small');
         this.V = document.createElement('div');
         this.V.classList.add('progress-small-val');
+        this.V.style.backgroundColor = G.panels[G.tables[this.location].location].color[3];
         this.P.appendChild(this.V);
         this.PC.appendChild(this.P);
         this.BC.appendChild(this.B);
         this.BC.appendChild(this.M);
         this.E.appendChild(this.PC);
         this.E.appendChild(this.BC);
+        this.E.appendChild(this.C);
         if (!this.unlocked) this.E.style.display = 'none';
     }
     CalcMax(points) {
@@ -339,25 +341,24 @@ D.Buyable = class Buyable {
     }
     Update() {
         if (this.type == 'p') {
-            this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' Pts';
+            this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' Pts<br>' + this.desc;
             this.V.style.width = Math.min(G.points.div(this.cost).mul(100).toFixed(1), 100) + '%';
         }
         else {
-            this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' ' + C[this.type].name;
+            this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' ' + C[this.type].name + '<br>' + this.desc;
             this.V.style.width = Math.min(C[this.type].amt.div(this.cost).mul(100).toFixed(1), 100) + '%';
         }
-        this.A.innerHTML = ' Buyable: ' + this.CalcMax(G.points);
         this.N.innerHTML = this.name + ' [' + this.owned + ']';
         if (!this.unlocked) {
             this.unlocked = this.condition();
-            if (this.unlocked) this.T.style.display = 'inline-block';
+            if (this.unlocked) this.E.style.display = 'table-row';
         }
     }
     Reset() {
         this.owned = 0;
         this.cost = this.initial;
         this.unlocked = false;
-        this.T.style.display = 'none';
+        this.E.style.display = 'none';
         for (const v in this.startVar) {
             this[v] = this.startVar[v];
         }
@@ -673,6 +674,12 @@ D.Table = class Table {
         this.E.classList.add('listing');
         if (!this.unlocked) this.E.style.display = 'none';
         G.panels[this.location].S.appendChild(this.E);
+    }
+    Tick () {
+        if (!this.unlocked) {
+            this.unlocked = this.condition();
+            if (this.unlocked) this.E.style.display = '';
+        }
     }
 }
 

@@ -85,6 +85,9 @@ function Main() {
     for (const c in C) {
         C[c].Tick();
     }
+    for (const t in G.tables) {
+        G.tables[t].Tick();
+    }
     for (const m in G.milestones) {
         G.milestones[m].Tick();
         if (!G.milestones[m].achieved) continue;
