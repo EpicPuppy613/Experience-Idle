@@ -1,4 +1,7 @@
 A
+.StartMod(
+    "Base", "base", "0.0.0"
+)
 //PANELS
 .Panel(
     "Xp Valley", "xp",
@@ -201,3 +204,4 @@ A
     function () {return C.crates.amt.gte(1000)}, "cargo", 2, false, function () {}, "#110700", "#530",
     "gold", function () {return 0}, function () {return new Decimal(3)} 
 )
+.EndMod();

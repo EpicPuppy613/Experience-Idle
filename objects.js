@@ -15,6 +15,7 @@ G.milestones = {};
 G.devgain = {};
 G.tables = {};
 G.blocks = {};
+G.modloader = null;
 G.start = performance.now();
 G.log = function (message, color="white") {
     const T = new Date();
@@ -232,6 +233,7 @@ D.Buyable = class Buyable {
         this.generate = generate;
         this.increase = increase;
         this.mult = mult;
+        this.mod = G.modloader;
         try {
             this.unlocked = this.condition();
         } catch {
@@ -372,6 +374,7 @@ D.Panel = class Panel {
         this.id = id;
         this.color = [color1, color2, color3, color4];
         this.condition = condition;
+        this.mod = G.modloader;
         try {
             this.unlocked = this.condition();
         } catch {
@@ -417,6 +420,7 @@ D.Currency = class Currency {
         this.location = location;
         this.condition = condition;
         this.tier = tier;
+        this.mod = G.modloader;
         this.mult = new Decimal(1);
         try {
             this.unlocked = this.condition();
@@ -474,6 +478,7 @@ D.Ascension = class Ascension {
         this.name = name;
         this.id = id;
         this.currency = currency;
+        this.mod = G.modloader;
         this.req = new Decimal(req);
         this.target = target;
         this.scale = scale;
@@ -613,6 +618,7 @@ D.Milestone = class Milestone {
         this.target = target;
         this.gain = gain;
         this.mult = mult;
+        this.mod = G.modloader;
         try {
             this.achieved = this.milestone();
         } catch {
@@ -664,6 +670,7 @@ D.Table = class Table {
         this.name = name;
         this.id = id;
         this.condition = condition;
+        this.mod = G.modloader;
         try {
             this.unlocked = this.condition();
         } catch {
@@ -690,6 +697,7 @@ D.Block = class Block {
         this.id = id;
         this.condition = condition;
         this.columns = columns;
+        this.mod = G.modloader;
         try {
             this.unlocked = this.condition();
         } catch {
