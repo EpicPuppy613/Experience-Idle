@@ -55,44 +55,47 @@ A
     "Crates", "crates", 0, "cargo", function () {return G.ascensions["csg"].ascensions.gte(1)}, 2
 )
 //XP VALLEY
+.Table(
+    "Absorbers", "absorbers", function () {return true}, "xp"
+)
 .Buyable(
     "XP Absorber I", "absorbs xp (+1/s)", "xp1", new Decimal(10), 1.5, function () {}, 
-    "xp", function () {return true}, 
+    "absorbers", function () {return true}, 
     {"inc": new Decimal(1)}, 
     'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber II", "absorbs more xp (+5/s)", "xp2", new Decimal(100), 1.55, function () {}, 
-    "xp", function () {return G.level.gte(5)||G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, 
+    "absorbers", function () {return G.level.gte(5)||G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, 
     {"inc": new Decimal(5)}, 
     'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber III", "absorbs even more xp (+25/s)", "xp3", new Decimal(1500), 1.6, function () {}, 
-    "xp", function () {return G.level.gte(15)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, 
+    "absorbers", function () {return G.level.gte(15)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, 
     {"inc": new Decimal(25)}, 
     'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber IV", "absorbs a lot of xp (+125/s)", "xp4", new Decimal(20000), 1.65, function () {}, 
-    "xp", function () {return G.level.gte(30)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, 
+    "absorbers", function () {return G.level.gte(30)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, 
     {"inc": new Decimal(125)}, 
     'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber V", "absorbs a ton of xp (+625/s)", "xp5", new Decimal(250000), 1.7, function () {G.gain = G.gain.add(this.inc)}, 
-    "xp", function () {return G.level.gte(50)||G.ascensions["lgm"].ascensions.gte(3)||G.ascensions["csg"].ascensions.gte(1)}, 
+    "absorbers", function () {return G.level.gte(50)||G.ascensions["lgm"].ascensions.gte(3)||G.ascensions["csg"].ascensions.gte(1)}, 
     {"inc": new Decimal(625)}, 
     'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Accelerator", "increases xp absorbtion rate (+25%)", "xpa", new Decimal(500), 2, function () {},
-    "xp", function () {return G.level.gte(10)||G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "absorbers", function () {return G.level.gte(10)||G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
     'p', 0, 'p', function () {return 0}, function () {return new Decimal(1.25).pow(this.owned)}
 )
 .Buyable(
     "XP Multiplier", "increases xp absorbtion rate (+100%)", "xpm", new Decimal(10000), 10, function () {},
-    "xp", function () {return G.level.gte(20)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "absorbers", function () {return G.level.gte(20)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
     'p', 0, 'p', function () {return 0}, function () {return new Decimal(2).pow(this.owned)}
 )
 //GOLD MINE

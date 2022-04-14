@@ -13,6 +13,8 @@ G.panels = {};
 G.ascensions = {};
 G.milestones = {};
 G.devgain = {};
+G.tables = {};
+G.blocks = {};
 G.start = performance.now();
 G.log = function (message, color="white") {
     const T = new Date();
@@ -59,7 +61,7 @@ const A = {};
  * @param {Number} initial - initial price of the buyable
  * @param {Number} gain - price gain of the buyable
  * @param {Function} onbuy - execute on purchase of the buyable
- * @param {String} location - containing panel of the buyable
+ * @param {String} location - containing table of the buyable
  * @param {Function} condition - function that returns true when the buyable should be unlocked
  * @param {Object} vars - internal variables for the buyable
  * @param {String} type - purchase currency
@@ -106,7 +108,7 @@ A.Panel = function (title, id, color1, color2, color3, color4, condition) {
  * @param {String} name - the name of the currency
  * @param {String} id - the unique id of the currency
  * @param {Number} initial - the initial amount of the currency
- * @param {String} location - the containing panel for the currency
+ * @param {String} location - the containing block for the currency
  * @param {Function} condition - function should return true if the currency is unlocked
  * @param {Number} tier - tier for resetting on ascension
  */
@@ -130,7 +132,7 @@ A.Currency = function (name, id, initial, location, condition, tier) {
  * @param {Function} scale - scaling for multiple of the new currency
  * @param {Number} mult - total multiplier for the new currency
  * @param {Function} condition - function that returns true if the ascension is unlocked
- * @param {String} location - panel container for the ascension
+ * @param {String} location - block container for the ascension
  * @param {Number} tier - tier of reset, all lower tiers are reset
  */
 A.Ascension = function (name, id, currency, req, target, scale, mult, condition, location, tier) {
@@ -152,7 +154,7 @@ A.Ascension = function (name, id, currency, req, target, scale, mult, condition,
  * @param {String} id - unique id for the milestone
  * @param {Function} condition - function returns true if milestone should be unlocked
  * @param {Function} milestone - function returns true when milestone should be achieved
- * @param {String} location - panel container for the milestone
+ * @param {String} location - block container for the milestone
  * @param {Number} tier - tier of ascension
  * @param {Boolean} preserve - keep milestone on ascension regardless of tier
  * @param {Function} onget - function to run when milestone is achieved
@@ -165,10 +167,47 @@ A.Ascension = function (name, id, currency, req, target, scale, mult, condition,
 A.Milestone = function (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2, target, gain, mult) {
     try {
         const m = new D.Milestone(name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2, target, gain, mult);
-        G.milestones[m.id] = m
+        G.milestones[m.id] = m;
     }
     catch (err) {
         G.log("ERROR/MILESTONE: " + err.stack, "#faa");
+        G.errors++;
+    }
+    return this;
+}
+/**
+ * A table to hold buyable listings
+ * @param {String} name - the name of the table
+ * @param {String} id - the id of the table
+ * @param {Function} condition - function returns true if table should be unlocked
+ * @param {String} location - panel container for the table
+ */
+A.Table = function (name, id, condition, location) {
+    try {
+        const t = new D.Table(name, id, condition, location);
+        G.tables[t.id] = t;
+    }
+    catch (err) {
+        G.log("ERROR/TABLE: " + err.stack, "#faa");
+        G.errors++;
+    }
+    return this;
+}
+/**
+ * A block to hold milestones and ascensions
+ * @param {String} name - the name of the block
+ * @param {String} id - the id of the block
+ * @param {Function} condition - function returns true if block should be unlocked
+ * @param {String} location - panel container for the block
+ * @param {Number} columns - the number of columns in the block
+ */
+ A.Block = function (name, id, condition, location, columns) {
+    try {
+        const b = new D.Block(name, id, condition, location, columns);
+        G.blocks[b.id] = b;
+    }
+    catch (err) {
+        G.log("ERROR/BLOCK: " + err.stack, "#faa");
         G.errors++;
     }
     return this;
@@ -177,7 +216,7 @@ A.Milestone = function (name, desc, id, condition, milestone, location, tier, pr
 const D = {};
 D.Buyable = class Buyable {
     constructor(name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier, generate, increase, mult) {
-        G.log(`INIT/BUYABLE: ${id}, ${name}, ${initial.toFixed(2)}, ${location}`, "#cfc");
+        G.log(`INIT/BUYABLE: ${id}, ${name}, ${initial.toFixed(2)}, ${location}`, "#bfb");
         this.name = name;
         this.desc = desc;
         this.id = id;
@@ -203,46 +242,40 @@ D.Buyable = class Buyable {
             this[variable] = vars[variable];
             this.startVar[variable] = vars[variable];
         }
-        this.E = document.createElement('div');
-        this.T = document.createElement('p');
-        this.N = document.createElement('h3');
+        this.E = document.createElement('tr');
+        this.N = document.createElement('th');
+        this.N.innerHTML = this.name;
+        this.E.appendChild(this.N);
         this.DO = document.createElement('option');
         this.DO.innerHTML = this.name;
         this.DO.value = this.id;
-        G.panels[this.location].BO.appendChild(this.DO);
-        this.D = document.createElement('span');
-        this.D.innerHTML = this.desc;
-        this.N.innerHTML = this.name;
-        this.E.appendChild(this.T);
-        this.E.style.display = 'inline-block';
-        this.E.style.width = '90%';
-        this.T.style.width = '100%';
-        this.T.appendChild(this.N);
-        G.panels[this.location].S.appendChild(this.E);
+        G.panels[G.tables[this.location].location].BO.appendChild(this.DO);
+        // this.D = document.createElement('td');
+        // this.D.innerHTML = this.desc;
+        G.tables[this.location].E.appendChild(this.E);
+        this.BC = document.createElement('td');
         this.B = document.createElement('button');
         this.B.innerHTML = 'Buy 1';
         this.M = document.createElement('button');
-        this.M.innerHTML = 'Buy Max';
+        this.M.innerHTML = 'Max';
         this.C = document.createElement('span');
         if (this.type == 'p') this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' Pts';
         else this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' ' + C[this.type].name;
         this.A = document.createElement('span');
         this.A.innerHTML = ' Buyable: 0';
+        this.PC = document.createElement('td');
+        this.PC.style.width = '30%';
         this.P = document.createElement('div');
         this.P.classList.add('progress-small');
         this.V = document.createElement('div');
         this.V.classList.add('progress-small-val');
-        this.V.style.backgroundColor = G.panels[this.location].color[3];
         this.P.appendChild(this.V);
-        this.T.appendChild(this.D);
-        this.T.appendChild(document.createElement('br'));
-        this.T.appendChild(this.P);
-        this.T.appendChild(this.B);
-        this.T.appendChild(this.C);
-        this.T.appendChild(document.createElement('br'));
-        this.T.appendChild(this.M);
-        this.T.appendChild(this.A);
-        if (!this.unlocked) this.T.style.display = 'none';
+        this.PC.appendChild(this.P);
+        this.BC.appendChild(this.B);
+        this.BC.appendChild(this.M);
+        this.E.appendChild(this.PC);
+        this.E.appendChild(this.BC);
+        if (!this.unlocked) this.E.style.display = 'none';
     }
     CalcMax(points) {
         if (this.type == 'p') return BruteForceIntegral(this.cost, this.gain, points);
@@ -333,7 +366,7 @@ D.Buyable = class Buyable {
 }
 D.Panel = class Panel {
     constructor(title, id, color1, color2, color3, color4, condition) {
-        G.log(`INIT/PANEL: ${id}, ${title}`, "#ffc");
+        G.log(`INIT/PANEL: ${id}, ${title}`, "#ffb");
         this.title = title;
         this.id = id;
         this.color = [color1, color2, color3, color4];
@@ -364,7 +397,6 @@ D.Panel = class Panel {
         this.E.style.color = this.color[2];
         this.E.classList.add('panel');
         this.S = document.createElement('div');
-        this.S.style.columns = '2';
         this.E.appendChild(this.S);
         document.getElementById('main').appendChild(this.E);
     }
@@ -377,7 +409,7 @@ D.Panel = class Panel {
 }
 D.Currency = class Currency {
     constructor(name, id, initial, location, condition, tier) {
-        G.log(`INIT/CURRENCY: ${id}, ${name}, ${initial.toFixed(2)}, ${location}`, "#ccf");
+        G.log(`INIT/CURRENCY: ${id}, ${name}, ${initial.toFixed(2)}, ${location}`, "#bbf");
         this.name = name;
         this.id = id;
         this.initial = initial;
@@ -437,7 +469,7 @@ D.Currency = class Currency {
 
 D.Ascension = class Ascension {
     constructor(name, id, currency, req, target, scale, mult, condition, location, tier) {
-        G.log(`INIT/ASCNESION: ${id}, ${name}, ${currency}, ${target}, ${location}`, "#cff");
+        G.log(`INIT/ASCNESION: ${id}, ${name}, ${currency}, ${target}, ${location}`, "#bff");
         this.name = name;
         this.id = id;
         this.currency = currency;
@@ -566,7 +598,7 @@ D.Ascension = class Ascension {
 
 D.Milestone = class Milestone {
     constructor (name, desc, id, condition, milestone, location, tier, preserve, onget, color1, color2, target, gain, mult) {
-        G.log(`INIT/MILESTONE: ${id}, ${name}, ${location}, ${target}`, "#fcf");
+        G.log(`INIT/MILESTONE: ${id}, ${name}, ${location}, ${target}`, "#fbf");
         this.name = name;
         this.desc = desc;
         this.id = id;
@@ -622,5 +654,45 @@ D.Milestone = class Milestone {
         this.E.style.backgroundColor = this.color[0];
         this.unlocked = this.condition();
         if (!this.unlocked) this.E.style.display = 'none';
+    }
+}
+
+D.Table = class Table {
+    constructor (name, id, condition, location) {
+        G.log(`INIT/TABLE: ${id}, ${name}, ${location}`, "#dfb");
+        this.name = name;
+        this.id = id;
+        this.condition = condition;
+        try {
+            this.unlocked = this.condition();
+        } catch {
+            this.unlocked = false;
+        }
+        this.location = location;
+        this.E = document.createElement('table');
+        this.E.classList.add('listing');
+        if (!this.unlocked) this.E.style.display = 'none';
+        G.panels[this.location].S.appendChild(this.E);
+    }
+}
+
+D.Block = class Block {
+    constructor (name, id, condition, location, columns) {
+        G.log(`INIT/BLOCK: ${id}, ${name}, ${location}, ${columns}`, "#fbd");
+        this.name = name;
+        this.id = id;
+        this.condition = condition;
+        this.columns = columns;
+        try {
+            this.unlocked = this.condition();
+        } catch {
+            this.unlocked = false;
+        }
+        this.location = location;
+        this.E = document.createElement('div');
+        this.E.classList.add('block');
+        this.E.style.columnCount = columns;
+        if (!this.unlocked) this.E.style.display = 'none';
+        G.panels[this.location].S.appendChild(this.E);
     }
 }
