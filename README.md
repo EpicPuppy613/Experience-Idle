@@ -10,6 +10,6 @@ This is Experience Idle, a idle game where the goal is to level up.
 ![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/EpicPuppy613/Experience-Idle?include_prereleases&label=experimental)
 
 ## Stats
-- Current Prestige Tiers: 1
-- Estimated Total Playtime: 40m
+- Current Prestige Tiers: 2
+- Estimated Total Playtime: 2h
 - Total Buyables: 13
