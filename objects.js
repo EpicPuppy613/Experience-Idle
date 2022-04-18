@@ -6,6 +6,8 @@ G.percent = 0;
 G.gain = new Decimal(0);
 G.mult = new Decimal(1);
 G.points = new Decimal(10);
+G.modlist = {};
+G.loading = [];
 G.buyables = {};
 G.errors = 0;
 G.limit = 1;
@@ -21,21 +23,21 @@ G.log = function (message, color="white") {
     const T = new Date();
     const M = document.createElement('span');
     const passed = performance.now() - G.start;
-    const scroll = E.console.scrollTop + E.console.clientHeight >= E.console.scrollHeight;
-    if (passed < 1000) {
-        M.innerHTML = `[${T.toLocaleTimeString()} ; ${(performance.now() - G.start).toFixed(1)} ms] ` + message;
-    } else if (passed < 60000) {
-        M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/1000).toFixed(2)} s] ` + message;
-    } else {
-        M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/60000).toFixed(2)} m] ` + message;
-    }
+    const scroll = E.console.scrollTop + E.console.clientHeight + 10 >= E.console.scrollHeight;
+    if (passed/1000 < 1) M.innerHTML = `[${T.toLocaleTimeString()} ; ${(performance.now() - G.start).toFixed(1)} ms] ` + message;
+    else if (passed/1000 < 60) M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/1000).toFixed(2)} s] ` + message;
+    else if (passed/1000 < 3600) M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/60000).toFixed(2)} m] ` + message;
+    else M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/3600000).toFixed(3)}} h] ` + message;
     M.style.color = color;
     E.console.appendChild(M);
     E.console.appendChild(document.createElement('br'));
-    if (scroll) {
-        E.console.scrollTop = E.console.scrollHeight - E.console.clientHeight;
-    }
-} 
+    if (scroll) E.console.scrollTop = E.console.scrollHeight - E.console.clientHeight;
+}
+
+//SCALING CONFIGURATION
+const S = {};
+//LEVEL SCALING
+S.level = 1.5;
 
 const C = {};
 
@@ -221,11 +223,11 @@ D.Buyable = class Buyable {
         this.name = name;
         this.desc = desc;
         this.id = id;
-        this.cost = new Decimal(initial);
+        this.cost = new Decimal(initial); //SAVE
         this.initial = new Decimal(initial);
         this.gain = gain;
         this.OnBuy = onbuy;
-        this.owned = 0;
+        this.owned = 0; //SAVE
         this.location = location;
         this.condition = condition;
         this.type = type;
@@ -234,6 +236,7 @@ D.Buyable = class Buyable {
         this.increase = increase;
         this.mult = mult;
         this.mod = G.modloader;
+        G.modlist[this.mod].buyables.push(this.id);
         try {
             this.unlocked = this.condition();
         } catch {
@@ -366,6 +369,16 @@ D.Buyable = class Buyable {
         }
         this.Update();
     }
+    Save() {
+        const data = {
+            cost: this.cost,
+            owned: this.owned
+        }
+        for (const v in this.startVar) {
+            data[v] = this[v];
+        }
+        return data;
+    }
 }
 D.Panel = class Panel {
     constructor(title, id, color1, color2, color3, color4, condition) {
@@ -421,6 +434,7 @@ D.Currency = class Currency {
         this.condition = condition;
         this.tier = tier;
         this.mod = G.modloader;
+        G.modlist[this.mod].currencies.push(this.id);
         this.mult = new Decimal(1);
         try {
             this.unlocked = this.condition();
@@ -470,6 +484,11 @@ D.Currency = class Currency {
         this.E.style.display = 'none';
         this.Tick();
     }
+    Save() {
+        return {
+            amt: this.amt
+        }
+    }
 }
 
 D.Ascension = class Ascension {
@@ -479,6 +498,7 @@ D.Ascension = class Ascension {
         this.id = id;
         this.currency = currency;
         this.mod = G.modloader;
+        G.modlist[this.mod].ascensions.push(this.id);
         this.req = new Decimal(req);
         this.target = target;
         this.scale = scale;
@@ -600,6 +620,11 @@ D.Ascension = class Ascension {
     Reset() {
         this.ascensions = new Decimal(0);
     }
+    Save() {
+        return {
+            ascensions: this.ascensions
+        }
+    }
 }
 
 D.Milestone = class Milestone {
@@ -619,6 +644,7 @@ D.Milestone = class Milestone {
         this.gain = gain;
         this.mult = mult;
         this.mod = G.modloader;
+        G.modlist[this.mod].milestones.push(this.id);
         try {
             this.achieved = this.milestone();
         } catch {
@@ -661,6 +687,11 @@ D.Milestone = class Milestone {
         this.E.style.backgroundColor = this.color[0];
         this.unlocked = this.condition();
         if (!this.unlocked) this.E.style.display = 'none';
+    }
+    Save() {
+        return {
+            achieved: this.achieved
+        }
     }
 }
 

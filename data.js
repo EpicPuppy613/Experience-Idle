@@ -63,33 +63,28 @@ A
 )
 .Buyable(
     "XP Absorber I", "(+1/s xp)", "xp1", new Decimal(10), 1.5, function () {}, 
-    "absorbers", function () {return true}, 
-    {"inc": new Decimal(1)}, 
-    'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
+    "absorbers", function () {return true}, {}, 
+    'p', 0, 'p', function () {return new Decimal(1).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber II", "(+5/s xp)", "xp2", new Decimal(100), 1.55, function () {}, 
-    "absorbers", function () {return G.level.gte(5)||G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, 
-    {"inc": new Decimal(5)}, 
-    'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
+    "absorbers", function () {return G.level.gte(5)||G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    'p', 0, 'p', function () {return new Decimal(5).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber III", "(+25/s xp)", "xp3", new Decimal(1500), 1.6, function () {}, 
-    "absorbers", function () {return G.level.gte(15)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, 
-    {"inc": new Decimal(25)}, 
-    'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
+    "absorbers", function () {return G.level.gte(15)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    'p', 0, 'p', function () {return new Decimal(25).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber IV", "(+125/s xp)", "xp4", new Decimal(20000), 1.65, function () {}, 
-    "absorbers", function () {return G.level.gte(30)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, 
-    {"inc": new Decimal(125)}, 
-    'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
+    "absorbers", function () {return G.level.gte(30)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    'p', 0, 'p', function () {return new Decimal(125).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber V", "(+625/s xp)", "xp5", new Decimal(250000), 1.7, function () {G.gain = G.gain.add(this.inc)}, 
-    "absorbers", function () {return G.level.gte(50)||G.ascensions["lgm"].ascensions.gte(3)||G.ascensions["csg"].ascensions.gte(1)}, 
-    {"inc": new Decimal(625)}, 
-    'p', 0, 'p', function () {return this.inc.mul(this.owned)}, function () {return 1}
+    "absorbers", function () {return G.level.gte(50)||G.ascensions["lgm"].ascensions.gte(3)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    'p', 0, 'p', function () {return new Decimal(625).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Accelerator", "(+25% xp)", "xpa", new Decimal(500), 2, function () {},

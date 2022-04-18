@@ -46,6 +46,7 @@
             </div>
             <div id="devmenu">
                 <strong>DEV MENU</strong><br>
+                <button onclick="window.localStorage.clear()">CLEAR ALL SAVE DATA</button><br>
                 Give Currency: <input id="give" maxlength="10"> <select id="givecurrency">
                     <option value="p">Points</option>
                 </select> <button onclick="DevGive()">Give</button><br>
@@ -74,15 +75,15 @@
     <script src="objects.js"></script>
     <script src="saving.js"></script>
     <script src="script.js"></script>
-    <script src="data.js"></script>
+    <script>A.InitMod("data", "data.js", []);</script>
 
     <footer>
         Running 
         <span style="color:aqua">VERSION</span> 
-        <span style="color:dodgerblue">0.0.0</span> 
-        <span style="color:lime">DEV-PREVIEW</span> 
-        <span style="color:greenyellow">11.1</span><br>
-        <span style="color:gray">0.0.0-dev.11.1</span>
+        <span style="color:dodgerblue">0.0.1</span> 
+        <span style="color:crimson">ALPHA</span> 
+        <span style="color:indianred">1.0</span><br>
+        <span style="color:gray">0.0.1-alpha.1.0</span>
     </footer>
 
 </body>
