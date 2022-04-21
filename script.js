@@ -234,10 +234,10 @@ K = "";
 document.addEventListener('keydown', function (e) {
     if (e.key == 'Enter') {
         switch (K) {
-            case "devhax":
+            case "ruinmygame":
                 document.getElementById("devmenu").style.display = '';
                 break;
-            case "nohax":
+            case "nostop":
                 document.getElementById("devmenu").style.display = 'none';
                 break;
             case "debug":
@@ -254,7 +254,15 @@ document.addEventListener('keydown', function (e) {
                 document.getElementById("debugconsole").style.display = 'none';
         }
         K = "";
-    } else {
+    } else if ((/^[a-z](?!.)/).test(e.key)){
         K += e.key;
+    } else if (e.key == "Backspace") {
+        K = K.slice(0, -1);
+    }
+    if (K != "") {
+        document.getElementById('devinput').style.display = '';
+        document.getElementById('devinput').innerHTML = `> ${K}`;
+    } else {
+        document.getElementById('devinput').style.display = 'none';
     }
 })
