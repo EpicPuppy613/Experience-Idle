@@ -6,8 +6,9 @@ else {
     G.points = new Decimal(core.points);
     G.need = new Decimal(500).mul(new Decimal(S.level).pow(core.level));
     G.level = new Decimal(core.level);
+    G.tiers = core.tiers;
+    G.log("SAVE/CORE: Successfully loaded data!", "#5f6");
 }
-G.log("SAVE/CORE: Successfully loaded data!", "#5f6");
 
 A.InitMod = function (id, file, dependencies) {
     G.loading[id] = setInterval(function () {
@@ -65,11 +66,23 @@ A.EndMod = function () {
 }
 
 G.Save = function () {
+    try {
     window.localStorage.setItem('core', JSON.stringify({
         xp: G.xp,
         points: G.points,
-        level: G.level
+        level: G.level,
+        tiers: G.tiers
     }));
+    allmods = JSON.parse(window.localStorage.getItem('modlist'));
+    if (allmods == null) {
+        allmods = [];
+    }
+    for (const mod in G.modlist) {
+        if (!allmods.includes(mod)) {
+            allmods.push(mod);
+        }
+    }
+    window.localStorage.setItem('modlist', JSON.stringify(allmods));
     for (const mod in G.modlist) {
         const package = {
             b: {},
@@ -83,7 +96,10 @@ G.Save = function () {
         for (const m of G.modlist[mod].milestones) package.m[m] = G.milestones[m].Save();
         window.localStorage.setItem(mod, JSON.stringify(package));
     }
-    G.log("INFO/SAVE: Successfully saved data!", "#5f8");
+    //G.log("INFO/SAVE: Successfully saved data!", "#5f8");
+    } catch (err) {
+        G.log("ERROR/SAVE: " + err.stack, "#faa");
+    } 
 }
 
 D.Mod = class Mod {
@@ -109,3 +125,36 @@ G.saveloop = setInterval(function () {
         }
     }
 }, 30000);
+
+G.Export = function () {
+    try {
+        G.Save();
+        const data = {
+            core: JSON.parse(window.localStorage.getItem('core'))
+        }
+        const modlist = JSON.parse(window.localStorage.getItem('modlist'));
+        for (const mod of modlist) {
+            data[mod] = JSON.parse(window.localStorage.getItem(mod));
+        }
+        return btoa(JSON.stringify(data));
+    } catch (err) {
+        G.log("ERROR/EXPORT: " + err.stack, "#faa");
+        return "";
+    }
+}
+
+G.Import = function (raw) {
+    try {
+        data = JSON.parse(atob(raw));
+        if (data == null || data == '') {
+            return;
+        }
+        window.localStorage.setItem('modlist', JSON.stringify(Object.keys(data)));
+        for (const mod in data) {
+            window.localStorage.setItem(mod, JSON.stringify(data[mod]));
+        }
+        alert("Imported Save! Reload the page to take effect.\n(Or wait at least 30 seconds to undo)")
+    } catch (err) {
+        G.log("ERROR/IMPORT: " + err.stack, "#faa");
+    }
+}

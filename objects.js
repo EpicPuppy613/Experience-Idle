@@ -13,6 +13,8 @@ G.errors = 0;
 G.limit = 1;
 G.panels = {};
 G.ascensions = {};
+G.tiers = {};
+G.texts = {};
 G.milestones = {};
 G.devgain = {};
 G.tables = {};
@@ -27,7 +29,7 @@ G.log = function (message, color="white") {
     if (passed/1000 < 1) M.innerHTML = `[${T.toLocaleTimeString()} ; ${(performance.now() - G.start).toFixed(1)} ms] ` + message;
     else if (passed/1000 < 60) M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/1000).toFixed(2)} s] ` + message;
     else if (passed/1000 < 3600) M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/60000).toFixed(2)} m] ` + message;
-    else M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/3600000).toFixed(3)}} h] ` + message;
+    else M.innerHTML = `[${T.toLocaleTimeString()} ; ${((performance.now() - G.start)/3600000).toFixed(3)} h] ` + message;
     M.style.color = color;
     E.console.appendChild(M);
     E.console.appendChild(document.createElement('br'));
@@ -216,6 +218,26 @@ A.Table = function (name, id, condition, location) {
     return this;
 }
 
+/**
+ * A custom html element that can contain text
+ * @param {String} id - the id of the text (can not conflict with texts or breaks)
+ * @param {String} inner - the inner portion of the element (innerHTML)
+ * @param {String} element - the element tag of the text
+ * @param {Object} tags - a object containing all of the element paramaters
+ * @param {Function} condition - function returns true if text should be unlocked
+ * @param {String} location - the block location of the text
+ * @param {Object} style - the style properties of the element
+ */
+A.Text = function (id, inner, element, tags, condition, location, style) {
+    try {
+        G.texts[id] = new D.Text(id, inner, element, tags, condition, location, style);
+    } catch (err) {
+        G.log("ERROR/TEXT: " + err.stack, "#faa");
+        G.errors++;
+    }
+    return this;
+}
+
 const D = {};
 D.Buyable = class Buyable {
     constructor(name, desc, id, initial, gain, onbuy, location, condition, vars, type, tier, generate, increase, mult) {
@@ -372,7 +394,8 @@ D.Buyable = class Buyable {
     Save() {
         const data = {
             cost: this.cost,
-            owned: this.owned
+            owned: this.owned,
+            unlocked: this.unlocked
         }
         for (const v in this.startVar) {
             data[v] = this[v];
@@ -452,7 +475,7 @@ D.Currency = class Currency {
         this.DO = document.createElement('option');
         this.DO.innerHTML = this.name;
         this.DO.value = this.id;
-        G.panels[this.location].CO.appendChild(this.DO);
+        G.panels[G.blocks[this.location].location].CO.appendChild(this.DO);
         this.GC = document.createElement('option');
         this.GC.value = id;
         this.GC.innerHTML = name;
@@ -461,7 +484,7 @@ D.Currency = class Currency {
         this.RC.value = id;
         this.RC.innerHTML = name;
         document.getElementById('gaincurrency').appendChild(this.RC);
-        G.panels[this.location].S.appendChild(this.E);
+        G.blocks[this.location].E.appendChild(this.E);
         if (!this.unlocked) {
             this.E.style.display = 'none';
         }
@@ -486,7 +509,8 @@ D.Currency = class Currency {
     }
     Save() {
         return {
-            amt: this.amt
+            amt: this.amt,
+            unlocked: this.unlocked
         }
     }
 }
@@ -523,7 +547,7 @@ D.Ascension = class Ascension {
         this.DO = document.createElement('option');
         this.DO.innerHTML = this.name;
         this.DO.value = this.id;
-        G.panels[this.location].AO.appendChild(this.DO);
+        G.panels[G.blocks[this.location].location].AO.appendChild(this.DO);
         this.S = document.createElement('p');
         this.N = document.createElement('strong');
         this.N.innerHTML = 'Requires: ';
@@ -546,7 +570,7 @@ D.Ascension = class Ascension {
         this.S.appendChild(document.createElement('br'));
         this.S.appendChild(this.A);
         this.E.appendChild(this.S);
-        G.panels[this.location].S.appendChild(this.E);
+        G.blocks[this.location].E.appendChild(this.E);
     }
     Tick() {
         if (!this.unlocked) {
@@ -616,13 +640,15 @@ D.Ascension = class Ascension {
                 G.milestones[m].Reset();
             }
         }
+        G.tiers[this.tier] = true;
     }
     Reset() {
         this.ascensions = new Decimal(0);
     }
     Save() {
         return {
-            ascensions: this.ascensions
+            ascensions: this.ascensions,
+            unlocked: this.unlocked
         }
     }
 }
@@ -660,7 +686,7 @@ D.Milestone = class Milestone {
         this.DO = document.createElement('option');
         this.DO.innerHTML = this.name;
         this.DO.value = this.id;
-        G.panels[this.location].MO.appendChild(this.DO);
+        G.panels[G.blocks[this.location].location].MO.appendChild(this.DO);
         try {
             this.unlocked = this.condition();
         } catch {
@@ -670,12 +696,14 @@ D.Milestone = class Milestone {
         else this.E.style.display = 'inline-block';
         this.E.appendChild(this.T);
         this.E.appendChild(this.D);
-        G.panels[this.location].S.appendChild(this.E);
+        G.blocks[this.location].E.appendChild(this.E);
     }
     Tick() {
         if (!this.achieved) {
+            this.E.style.backgroundColor = this.color[0];
             this.achieved = this.milestone();
-            if (this.achieved) this.E.style.backgroundColor = this.color[1];
+        } else {
+            this.E.style.backgroundColor = this.color[1];
         }
         if (!this.unlocked) {
             this.unlocked = this.condition();
@@ -690,7 +718,8 @@ D.Milestone = class Milestone {
     }
     Save() {
         return {
-            achieved: this.achieved
+            achieved: this.achieved,
+            unlocked: this.unlocked
         }
     }
 }
@@ -740,5 +769,48 @@ D.Block = class Block {
         this.E.style.columnCount = columns;
         if (!this.unlocked) this.E.style.display = 'none';
         G.panels[this.location].S.appendChild(this.E);
+    }
+    Tick () {
+        if (!this.unlocked) {
+            this.unlocked = this.condition();
+            if (this.unlocked) this.E.style.display = '';
+        }
+    }
+}
+
+D.Text = class Text {
+    constructor (id, inner, element, tags, condition, location, style) {
+        G.log(`INIT/TEXT: ${id}, ${element}, ${location}`, "#fdb");
+        this.id = id;
+        this.inner = inner;
+        this.element = element;
+        this.tags = tags;
+        this.style = style;
+        this.condition = condition;
+        this.location = location;
+        this.E = document.createElement(this.element);
+        this.E.id = this.id;
+        this.E.innerHTML = this.inner;
+        for (const tag in this.tags) {
+            this.E[tag] = this.tags[tag];
+        }
+        for (const property in this.style) {
+            this.E.style[property] = this.style[property];
+        }
+        try {
+            this.unlocked = this.condition();
+        } catch {
+            this.unlocked = false;
+        }
+        if (!this.unlocked) {
+            this.E.style.display = 'none';
+        }
+        G.blocks[this.location].E.appendChild(this.E);
+    }
+    Tick () {
+        if (!this.unlocked) {
+            this.unlocked = this.condition();
+            if (this.unlocked) this.E.style.display = '';
+        }
     }
 }

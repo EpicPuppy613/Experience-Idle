@@ -9,11 +9,11 @@ A
 )
 .Panel(
     "Gold Mine", "gold",
-    "#220", "#330", "#ffd", "#ee0", function () {return G.points.gte(1e12)}
+    "#220", "#330", "#ffd", "#ee0", function () {return G.points.gte(1e12)||G.tiers[1]}
 )
 .Panel(
     "Cargo Center", "cargo",
-    "#210", "#320", "#fed", "#fa0", function () {return C.gold.amt.gte(1e14)}
+    "#210", "#320", "#fed", "#fa0", function () {return C.gold.amt.gte(1e14)||G.tiers[2]}
 )
 .Panel(
     "Laboratory", "lab",
@@ -47,15 +47,9 @@ A
     "Multiverse", "multiverse",
     "#012", "#023", "#def", "", function () {return false}
 )
-//CURRENCIES
-.Currency(
-    "Gold XP", "gxp", 0, "gold", function () {return G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, 1
-)
-.Currency(
-    "Gold", "gold", 0, "gold", function () {return G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, 1
-)
-.Currency(
-    "Crates", "crates", 0, "cargo", function () {return G.ascensions["csg"].ascensions.gte(1)}, 2
+.Panel(
+    "Settings", "settings",
+    "#111", "#111", "#eee", "#000", function () {return true}
 )
 //XP VALLEY
 .Table(
@@ -68,83 +62,98 @@ A
 )
 .Buyable(
     "XP Absorber II", "(+5/s xp)", "xp2", new Decimal(100), 1.55, function () {}, 
-    "absorbers", function () {return G.level.gte(5)||G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "absorbers", function () {return G.level.gte(5)||G.tiers[1]}, {}, 
     'p', 0, 'p', function () {return new Decimal(5).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber III", "(+25/s xp)", "xp3", new Decimal(1500), 1.6, function () {}, 
-    "absorbers", function () {return G.level.gte(15)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "absorbers", function () {return G.level.gte(15)||G.tiers[1]}, {}, 
     'p', 0, 'p', function () {return new Decimal(25).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber IV", "(+125/s xp)", "xp4", new Decimal(20000), 1.65, function () {}, 
-    "absorbers", function () {return G.level.gte(30)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "absorbers", function () {return G.level.gte(30)||G.tiers[1]}, {}, 
     'p', 0, 'p', function () {return new Decimal(125).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Absorber V", "(+625/s xp)", "xp5", new Decimal(250000), 1.7, function () {G.gain = G.gain.add(this.inc)}, 
-    "absorbers", function () {return G.level.gte(50)||G.ascensions["lgm"].ascensions.gte(3)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "absorbers", function () {return G.level.gte(50)||G.tiers[1]}, {}, 
     'p', 0, 'p', function () {return new Decimal(625).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "XP Accelerator", "(+25% xp)", "xpa", new Decimal(500), 2, function () {},
-    "absorbers", function () {return G.level.gte(10)||G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "absorbers", function () {return G.level.gte(10)||G.tiers[1]}, {}, 
     'p', 0, 'p', function () {return 0}, function () {return new Decimal(1.25).pow(this.owned)}
 )
 .Buyable(
     "XP Multiplier", "(+100% xp)", "xpm", new Decimal(10000), 10, function () {},
-    "absorbers", function () {return G.level.gte(20)||G.ascensions["lgm"].ascensions.gte(2)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "absorbers", function () {return G.level.gte(20)||G.tiers[1]}, {}, 
     'p', 0, 'p', function () {return 0}, function () {return new Decimal(2).pow(this.owned)}
 )
 //GOLD MINE
+.Block(
+    "Gold Facility", "gold", function () {return G.points.gte(1e12)||G.tiers[1]}, "gold", 1 
+)
 .Table(
-    "Gold Mines", "mine", function () {return G.ascensions["lgm"].ascensions.gte(1)}, "gold"
+    "Gold Mines", "mine", function () {return G.tiers[1]}, "gold"
+)
+.Currency(
+    "Gold XP", "gxp", 0, "gold", function () {return G.tiers[1]}, 1
+)
+.Currency(
+    "Gold", "gold", 0, "gold", function () {return G.tiers[1]}, 1
 )
 .Ascension(
     "Learn Gold Mining", "lgm", "gxp", 1e16, "p", function(amt) {return amt.log10().div(new Decimal(2).log10())},
-    1, function() {return G.points.gte(1e12)||G.ascensions["csg"].ascensions.gte(1)}, "gold", 1
+    1, function() {return G.points.gte(1e12)||G.tiers[1]}, "gold", 1
 )
 .Buyable(
     "Hand Mine Gold", "(+1 Gold)", "hmg", 1, 1.25, function () {C.gold.amt = C.gold.amt.add(1)}, 
-    "mine", function () {return G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "mine", function () {return G.tiers[1]}, {}, 
     "gxp", 1, "gold", function () {return 0}, function () {return 1}
 )
 .Buyable(
     "Gold Miner", "(1/s Gold)", "gmr", 1, 1.8, function () {},
-    "mine", function () {return G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, {},
+    "mine", function () {return G.tiers[1]}, {},
     "gold", 1, "gold", function () {return this.owned}, function () {return 1}
 )
 .Buyable(
     "Gold Drill I", "(10/s Gold)", "gd1", 100, 1.6, function () {},
-    "mine", function () {return G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)&&C.gold.amt.gt(0)}, {},
+    "mine", function () {return G.tiers[1]}, {},
     "gold", 1, "gold", function () {return new Decimal(10).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "Gold Drill II", "(100/s Gold)", "gd2", 1000, 1.65, function () {},
-    "mine", function () {return G.ascensions["lgm"].ascensions.gte(2)&&C.gold.amt.gt(1000)||G.ascensions["csg"].ascensions.gte(1)}, {},
+    "mine", function () {return G.tiers[1]}, {},
     "gold", 1, "gold", function () {return new Decimal(100).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "Gold Drill III", "(1000/s Gold)", "gd3", 10000, 1.7, function () {},
-    "mine", function () {return G.ascensions["lgm"].ascensions.gte(3)&&C.gold.amt.gt(100000)||G.ascensions["csg"].ascensions.gte(1)}, {},
+    "mine", function () {return G.tiers[1]}, {},
     "gold", 1, "gold", function () {return new Decimal(1000).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
-    "Gold Mining Training", "(+50% Gold)", "gmt", 5, 1.4, function () {},
-    "mine", function () {return G.ascensions["lgm"].ascensions.gte(1)||G.ascensions["csg"].ascensions.gte(1)}, {}, 
+    "Miner Training", "(+50% Gold)", "gmt", 5, 1.4, function () {},
+    "mine", function () {return G.tiers[1]}, {}, 
     "gxp", 1, "gold", function () {return 0}, function () {return new Decimal(1.5).pow(this.owned)}
 )
 .Buyable(
     "Golden Accelerator", "(+50% XP)", "gac", 250, 2, function () {},
-    "mine", function () {return G.ascensions["lgm"].ascensions.gte(1)&&C.gold.amt.gt(100)||G.ascensions["csg"].ascensions.gte(1)}, {},
+    "mine", function () {return G.tiers[1]}, {},
     "gold", 1, "p", function () {return 0}, function () {return new Decimal(1.5).pow(this.owned)}
 )
 .Buyable(
     "Golden Augment", "(+75% Gold)", "ga", 1000, 4, function () {},
-    "mine", function () {return G.ascensions["lgm"].ascensions.gte(2)&&C.gold.amt.gt(750)||G.ascensions["csg"].ascensions.gte(1)}, {},
+    "mine", function () {return G.tiers[1]}, {},
     "gold", 1, "gold", function () {return 0}, function () {return new Decimal(1.75).pow(this.owned)}
 )
 //Cargo Center
+.Block(
+    "Cargo Center", "cargo", function () {return C.gold.amt.gte(1e14)}, "cargo", 2 
+)
+.Currency(
+    "Crates", "crates", 0, "cargo", function () {return G.tiers[2]}, 2
+)
 .Ascension(
     "Ship Goods", "csg", "crates", 1e18, "gold", function (amt) {return amt.log10().div(new Decimal(3).log10())},
     1, function() {return C.gold.amt.gte(1e14)}, "cargo", 2
@@ -198,5 +207,32 @@ A
     "Cargo Supercenter", "1000 Crates: +200% gold", "csp10", function () {return C.crates.amt.gte(500)},
     function () {return C.crates.amt.gte(1000)}, "cargo", 2, false, function () {}, "#110700", "#530",
     "gold", function () {return 0}, function () {return new Decimal(3)} 
+)
+//SETTINGS
+.Block(
+    "Settings", "settings", function () {return true}, "settings", 1
+)
+.Text(
+    "save-menu-title", "Save Data Management", "h3", {},
+    function () {return true}, "settings", {}
+)
+.Text(
+    "save-menu", `
+    <button onclick="G.Save();G.log('INFO/SAVE: Manually saved', '#7f7')">Save Now</button> 
+    <button onclick="
+    G.Import(document.getElementById('save-data').value)
+    ">Import</button> 
+    <button onclick="
+    document.getElementById('save-data').value = G.Export();
+    ">Export</button> 
+    <button onclick="
+    if (confirm('ARE YOU SURE?')) window.localStorage.clear();
+    ">HARD RESET</button><br><br>
+    <button onclick="
+    document.getElementById('save-data').select();
+    navigator.clipboard.writeText(document.getElementById('save-data').value);
+    ">Copy</button><br>
+    <textarea id="save-data" cols=40 rows=4 style="resize:none;" placeholder="Paste save data here!"></textarea><br>
+    `, "p", {}, function () {return true}, "settings", {}
 )
 .EndMod();

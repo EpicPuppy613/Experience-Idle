@@ -83,6 +83,9 @@ function Main() {
     for (const t in G.tables) {
         G.tables[t].Tick();
     }
+    for (const b in G.blocks) {
+        G.blocks[b].Tick();
+    }
     for (const m in G.milestones) {
         G.milestones[m].Tick();
         if (!G.milestones[m].achieved) continue;
@@ -170,6 +173,7 @@ function RenderDebug() {
     const milestonedebug = document.getElementById('milestoneselect').value;
     if (milestonedebug == ' ') document.getElementById('milestoneinfo').innerHTML = ' ';
     else document.getElementById('milestoneinfo').innerHTML = JSON.stringify(G.milestones[milestonedebug]);
+    document.getElementById('tiers').innerHTML = JSON.stringify(G.tiers);
 }
 
 function DevGive() {
