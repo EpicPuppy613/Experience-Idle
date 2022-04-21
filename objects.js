@@ -54,6 +54,7 @@ E.console = document.getElementById('console');
 document.getElementById("devmenu").style.display = "none";
 document.getElementById("debugmenu").style.display = "none";
 document.getElementById("debugconsole").style.display = "none";
+document.getElementById("advdevmenu").style.display = "none";
 
 G.log("START INIT");
 
