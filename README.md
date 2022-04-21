@@ -13,3 +13,4 @@ This is Experience Idle, a idle game where the goal is to level up.
 - Current Prestige Tiers: 2
 - Estimated Total Playtime: 2h
 - Total Buyables: 13
+- Milestones: 10
