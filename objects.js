@@ -102,7 +102,9 @@ A.Buyable = function (name, desc, id, initial, gain, onbuy, location, condition,
 A.Panel = function (title, id, color1, color2, color3, color4, condition) {
     try {
         const p = new D.Panel(title, id, color1, color2, color3, color4, condition);
-        G.panels[p.id] = p
+        var id = p.id;
+        G.panels[id] = p;
+        G.panels[id].T.addEventListener('click', function () {G.panels[id].Toggle()});
     } catch (err) {
         G.log("ERROR/PANEL: " + err.stack, "#faa");
         G.errors++;
@@ -411,6 +413,7 @@ D.Panel = class Panel {
         this.id = id;
         this.color = [color1, color2, color3, color4];
         this.condition = condition;
+        this.expanded = true;
         this.mod = G.modloader;
         try {
             this.unlocked = this.condition();
@@ -420,7 +423,7 @@ D.Panel = class Panel {
         this.E = document.createElement('div');
         if (!this.unlocked) this.E.style.display = 'none';
         this.T = document.createElement('h2');
-        this.T.innerHTML = this.title;
+        this.T.innerHTML = this.title + " [+]";
         this.BO = document.createElement('optgroup');
         this.CO = document.createElement('optgroup');
         this.AO = document.createElement('optgroup');
@@ -441,10 +444,22 @@ D.Panel = class Panel {
         this.E.appendChild(this.S);
         document.getElementById('main').appendChild(this.E);
     }
-    Unlock() {
+    Unlock () {
         if (!this.unlocked) {
             this.unlocked = this.condition();
             if (this.unlocked) this.E.style.display = '';
+        }
+    }
+    Toggle () {
+        if (this.expanded) {
+            this.T.innerHTML = this.title + " [-]";
+            this.expanded = false;
+            this.S.style.display = 'none';
+        }
+        else {
+            this.T.innerHTML = this.title + " [+]";
+            this.expanded = true;
+            this.S.style.display = 'block';
         }
     }
 }

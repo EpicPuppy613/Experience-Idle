@@ -124,12 +124,12 @@ A
 )
 .Buyable(
     "Gold Drill II", "(100/s Gold)", "gd2", 1000, 1.65, function () {},
-    "mine", function () {return G.tiers[1]}, {},
+    "mine", function () {return G.ascensions["lgm"].ascensions.gte(2)||G.tiers[2]}, {},
     "gold", 1, "gold", function () {return new Decimal(100).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
     "Gold Drill III", "(1000/s Gold)", "gd3", 10000, 1.7, function () {},
-    "mine", function () {return G.tiers[1]}, {},
+    "mine", function () {return G.ascensions["lgm"].ascensions.gte(3)||G.tiers[2]}, {},
     "gold", 1, "gold", function () {return new Decimal(1000).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
@@ -144,7 +144,7 @@ A
 )
 .Buyable(
     "Golden Augment", "(+75% Gold)", "ga", 1000, 4, function () {},
-    "mine", function () {return G.tiers[1]}, {},
+    "mine", function () {return G.ascensions["lgm"].ascensions.gte(3)||G.tiers[2]}, {},
     "gold", 1, "gold", function () {return 0}, function () {return new Decimal(1.75).pow(this.owned)}
 )
 //Cargo Center
