@@ -51,7 +51,7 @@ A.EndMod = function () {
             return this;
         }
         for (const b in save.b) for (const v in save.b[b]) {
-            if (['cost'].includes(v)) G.buyables[b][v] = new Decimal(save.b[b][v]);
+            if (['cost','owned'].includes(v)) G.buyables[b][v] = new Decimal(save.b[b][v]);
             else G.buyables[b][v] = save.b[b][v];
         }
         for (const c in save.c) for (const v in save.c[c]) C[c][v] = new Decimal(save.c[c][v]);

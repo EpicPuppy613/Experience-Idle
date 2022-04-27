@@ -252,7 +252,7 @@ D.Buyable = class Buyable {
         this.initial = new Decimal(initial);
         this.gain = gain;
         this.OnBuy = onbuy;
-        this.owned = 0; //SAVE
+        this.owned = new Decimal(0); //SAVE
         this.location = location;
         this.condition = condition;
         this.type = type;
@@ -324,7 +324,7 @@ D.Buyable = class Buyable {
                 }
                 G.points = G.points.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
-                this.owned += 1;
+                this.owned = this.owned.add(1);
             }
         }
         else {
@@ -337,7 +337,7 @@ D.Buyable = class Buyable {
                 }
                 C[this.type].amt = C[this.type].amt.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
-                this.owned += 1;
+                this.owned = this.owned.add(1);
             }
         }
     }
@@ -352,7 +352,7 @@ D.Buyable = class Buyable {
                 }
                 G.points = G.points.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
-                this.owned += 1;
+                this.owned = this.owned.add(1);
             }
         }
         else {
@@ -365,7 +365,7 @@ D.Buyable = class Buyable {
                 }
                 C[this.type].amt = C[this.type].amt.sub(this.cost);
                 this.cost = this.cost.mul(this.gain);
-                this.owned += 1;
+                this.owned = this.owned.add(1);
             }
         }
     }
@@ -378,14 +378,15 @@ D.Buyable = class Buyable {
             this.C.innerHTML = ' Cost: ' + this.cost.toFixed(2).format() + ' ' + C[this.type].name + '<br>' + this.desc;
             this.V.style.width = Math.min(C[this.type].amt.div(this.cost).mul(100).toFixed(1), 100) + '%';
         }
-        this.N.innerHTML = this.name + ' [' + this.owned + ']';
+        if (this.owned.lt(9e7)) this.N.innerHTML = this.name + ' [' + this.owned.toFixed(0) + ']';
+        else this.N.innerHTML = this.name + ' [' + this.owned.toFixed(2) + ']';
         if (!this.unlocked) {
             this.unlocked = this.condition();
             if (this.unlocked) this.E.style.display = 'table-row';
         }
     }
     Reset() {
-        this.owned = 0;
+        this.owned = new Decimal(0);
         this.cost = this.initial;
         this.unlocked = false;
         this.E.style.display = 'none';
