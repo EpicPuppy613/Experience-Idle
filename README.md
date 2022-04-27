@@ -2,7 +2,7 @@
 This is Experience Idle, a idle game where the goal is to level up.
 
 [![PLAY NOW](https://img.shields.io/badge/PLAY%20GAME-exp.epicpuppy.dev-0af?style=for-the-badge)](https://exp.epicpuppy.dev)<br>
-[![MODDING DOCUMENTATION](https://img.shields.io/badge/MODDING-DOCUMENTATION-green?style=for-the-badge)](https://github.com/EpicPuppy613/Experience-Idle/wiki)
+[![MODDING DOCUMENTATION](https://img.shields.io/badge/-MODDING%20DOCUMENTATION-green?style=for-the-badge)](https://github.com/EpicPuppy613/Experience-Idle/wiki)
 
 ## Status
 ![GitHub issues](https://img.shields.io/github/issues/EpicPuppy613/Experience-Idle)
