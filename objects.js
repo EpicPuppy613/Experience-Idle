@@ -486,7 +486,7 @@ D.Currency = class Currency {
         this.E.style.display = 'inline-block';
         this.E.style.width = '90%';
         this.V = document.createElement('strong');
-        this.V.innerHTML = name + ': 0 (+0.00)';
+        this.V.innerHTML = name + ': 0 (0.00/s)';
         this.E.appendChild(this.V);
         this.DO = document.createElement('option');
         this.DO.innerHTML = this.name;
@@ -510,7 +510,7 @@ D.Currency = class Currency {
         if (this.unlocked) this.E.style.display = 'inline-block';
     }
     Tick () {
-        this.V.innerHTML = this.name + ': ' + this.amt.toFixed(2).format() + ' (+' + this.gain.mul(this.mult).toFixed(2).format() + ')';
+        this.V.innerHTML = this.name + ': ' + this.amt.toFixed(2).format() + ' (' + this.gain.mul(this.mult).toFixed(2).format() + '/s)';
         this.amt = this.amt.add(this.gain.mul(this.mult).div(50));
         if (!this.unlocked) {
             this.Unlock();

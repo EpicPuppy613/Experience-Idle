@@ -81,12 +81,12 @@ A
     'p', 0, 'p', function () {return new Decimal(625).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
-    "XP Accelerator", "(+25% xp)", "xpa", new Decimal(500), 2, function () {},
+    "XP Accelerator", "(+25% xp/s)", "xpa", new Decimal(500), 2, function () {},
     "absorbers", function () {return G.level.gte(10)||G.tiers[1]}, {}, 
     'p', 0, 'p', function () {return 0}, function () {return new Decimal(1.25).pow(this.owned)}
 )
 .Buyable(
-    "XP Multiplier", "(+100% xp)", "xpm", new Decimal(10000), 10, function () {},
+    "XP Multiplier", "(+100% xp/s)", "xpm", new Decimal(10000), 10, function () {},
     "absorbers", function () {return G.level.gte(20)||G.tiers[1]}, {}, 
     'p', 0, 'p', function () {return 0}, function () {return new Decimal(2).pow(this.owned)}
 )
@@ -133,17 +133,17 @@ A
     "gold", 1, "gold", function () {return new Decimal(1000).mul(this.owned)}, function () {return 1}
 )
 .Buyable(
-    "Miner Training", "(+50% Gold)", "gmt", 5, 1.4, function () {},
+    "Miner Training", "(+50% Gold/s)", "gmt", 5, 1.4, function () {},
     "mine", function () {return G.tiers[1]}, {}, 
     "gxp", 1, "gold", function () {return 0}, function () {return new Decimal(1.5).pow(this.owned)}
 )
 .Buyable(
-    "Golden Accelerator", "(+50% XP)", "gac", 250, 2, function () {},
+    "Golden Accelerator", "(+50% XP/s)", "gac", 250, 2, function () {},
     "mine", function () {return G.tiers[1]}, {},
     "gold", 1, "p", function () {return 0}, function () {return new Decimal(1.5).pow(this.owned)}
 )
 .Buyable(
-    "Golden Augment", "(+75% Gold)", "ga", 1000, 4, function () {},
+    "Golden Augment", "(+75% Gold/s)", "ga", 1000, 4, function () {},
     "mine", function () {return G.ascensions["lgm"].ascensions.gte(3)||G.tiers[2]}, {},
     "gold", 1, "gold", function () {return 0}, function () {return new Decimal(1.75).pow(this.owned)}
 )
@@ -156,7 +156,7 @@ A
 )
 .Ascension(
     "Ship Goods", "csg", "crates", 1e18, "gold", function (amt) {return amt.log10().div(new Decimal(3).log10())},
-    1, function() {return C.gold.amt.gte(1e14)}, "cargo", 2
+    1, function() {return C.gold.amt.gte(1e14)||G.tiers[2]}, "cargo", 2
 )
 .Milestone(
     "Small Cargo Post", "1 Crates: +20% xp", "csp1", function () {return G.panels.cargo.unlocked},
@@ -226,7 +226,7 @@ A
     document.getElementById('save-data').value = G.Export();
     ">Export</button> 
     <button onclick="
-    if (confirm('ARE YOU SURE?')) window.localStorage.clear();
+    if (confirm('ARE YOU SURE?')) {window.localStorage.clear();location.reload()}
     ">HARD RESET</button><br><br>
     <button onclick="
     document.getElementById('save-data').select();

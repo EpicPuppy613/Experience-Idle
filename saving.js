@@ -55,7 +55,10 @@ A.EndMod = function () {
             else G.buyables[b][v] = save.b[b][v];
         }
         for (const c in save.c) for (const v in save.c[c]) C[c][v] = new Decimal(save.c[c][v]);
-        for (const a in save.a) for (const v in save.a[a]) G.ascensions[a][v] = new Decimal(save.a[a][v]);
+        for (const a in save.a) for (const v in save.a[a]) {
+            if (['ascensions'].includes(v)) G.ascensions[a][v] = new Decimal(save.a[a][v]);
+            else G.ascensions[a][v] = save.a[a][v];
+        }
         for (const m in save.m) for (const v in save.m[m]) G.milestones[m][v] = save.m[m][v];
         G.log("SAVE/" + G.modloader.toUpperCase() + ": Successfully loaded data!", "#5f6");
         G.modloader = null;

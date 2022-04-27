@@ -129,7 +129,7 @@ function Main() {
 
 function UpdateUI() {
     E.level.innerHTML = 'Level ' + G.level.toFixed(0).format();
-    E.prog.innerHTML = G.percent + '% (+' + G.gain.mul(G.mult).div(G.need).mul(5000).toFixed(2).format() + '%)';
+    E.prog.innerHTML = G.percent + '% (' + G.gain.mul(G.mult).div(G.need).mul(5000).toFixed(2).format() + '%/2)';
     E.bar.style.width = Math.min(G.percent, 100) + '%';
     var points = G.points.toFixed(2).formatZeros().format();
     var gain = G.gain.mul(G.mult).toFixed(2).format();

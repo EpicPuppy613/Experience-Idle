@@ -145,3 +145,7 @@ button:disabled {
     width: 95%;
     margin: auto;
 }
+#currencyinfo, #buyableinfo, #ascensioninfo, #milestoneinfo {
+    word-wrap: normal;
+    text-align: left;
+}
