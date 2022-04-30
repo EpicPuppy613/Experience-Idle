@@ -232,7 +232,7 @@ A
     document.getElementById('save-data').select();
     navigator.clipboard.writeText(document.getElementById('save-data').value);
     ">Copy</button><br>
-    <textarea id="save-data" cols=40 rows=4 style="resize:none;" placeholder="Paste save data here!"></textarea><br>
+    <textarea id="save-data" cols=40 rows=4 style="resize:none;" placeholder="Paste your save data here!"></textarea><br>
     `, "p", {}, function () {return true}, "settings", {}
 )
 .EndMod();
