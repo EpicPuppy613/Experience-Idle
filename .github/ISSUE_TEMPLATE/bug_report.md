@@ -18,7 +18,7 @@ Steps to reproduce the behavior:
 4. See error
 
 **Save File**
-Create a [gist.github.com](https://gist.github.com) with your save file and paste the link here (saving isn't implemented yet so don't worry for now)
+Create a [gist.github.com](https://gist.github.com) with your save file and paste the link here
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
