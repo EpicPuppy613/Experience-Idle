@@ -424,7 +424,7 @@ D.Panel = class Panel {
         this.E = document.createElement('div');
         if (!this.unlocked) this.E.style.display = 'none';
         this.T = document.createElement('h2');
-        this.T.innerHTML = this.title + " [+]";
+        this.T.innerHTML = this.title + " [-]";
         this.BO = document.createElement('optgroup');
         this.CO = document.createElement('optgroup');
         this.AO = document.createElement('optgroup');
@@ -453,12 +453,12 @@ D.Panel = class Panel {
     }
     Toggle () {
         if (this.expanded) {
-            this.T.innerHTML = this.title + " [-]";
+            this.T.innerHTML = this.title + " [+]";
             this.expanded = false;
             this.S.style.display = 'none';
         }
         else {
-            this.T.innerHTML = this.title + " [+]";
+            this.T.innerHTML = this.title + " [-]";
             this.expanded = true;
             this.S.style.display = 'block';
         }
