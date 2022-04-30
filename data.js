@@ -226,7 +226,7 @@ A
     document.getElementById('save-data').value = G.Export();
     ">Export</button> 
     <button onclick="
-    if (confirm('ARE YOU SURE?')) {window.localStorage.clear();location.reload()}
+    if (confirm('Are you sure you want to hard reset and erase all your data?')) {window.localStorage.clear();location.reload()}
     ">HARD RESET</button><br><br>
     <button onclick="
     document.getElementById('save-data').select();
