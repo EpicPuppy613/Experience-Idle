@@ -226,13 +226,13 @@ A
     document.getElementById('save-data').value = G.Export();
     ">Export</button> 
     <button onclick="
-    if (confirm('ARE YOU SURE?')) {window.localStorage.clear();location.reload()}
+    if (confirm('Are you sure you want to hard reset and erase all your data?')) {window.localStorage.clear();location.reload()}
     ">HARD RESET</button><br><br>
     <button onclick="
     document.getElementById('save-data').select();
     navigator.clipboard.writeText(document.getElementById('save-data').value);
     ">Copy</button><br>
-    <textarea id="save-data" cols=40 rows=4 style="resize:none;" placeholder="Paste save data here!"></textarea><br>
+    <textarea id="save-data" cols=40 rows=4 style="resize:none;" placeholder="Paste your save data here!"></textarea><br>
     `, "p", {}, function () {return true}, "settings", {}
 )
 .EndMod();
